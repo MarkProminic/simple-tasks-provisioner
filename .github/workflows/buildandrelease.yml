@@ -14,8 +14,11 @@ jobs:
       - uses: GoogleCloudPlatform/release-please-action@v3
         id: release
         with:
-          release-type: ruby
-          package-name: ${{ env.GEM_NAME }}
+
+          command: manifest
+          default-branch: main
+          target-branch: main
+          package-name: demo-tasks
           bump-minor-pre-major: true
           bump-patch-for-minor-pre-major: true
           version-file: "version.rb"
