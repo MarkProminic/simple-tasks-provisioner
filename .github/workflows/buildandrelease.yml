@@ -1,0 +1,25 @@
+name: Build, Release and Publish
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  release-please:
+    runs-on:
+      - self-hosted
+      - debian-11
+    steps:
+      - uses: GoogleCloudPlatform/release-please-action@v3
+        id: release
+        with:
+          release-type: ruby
+          package-name: ${{ env.GEM_NAME }}
+          bump-minor-pre-major: true
+          bump-patch-for-minor-pre-major: true
+          version-file: "version.rb"
+
+      # Checkout code if release was created
+      - uses: actions/checkout@v2
+        if: ${{ steps.release.outputs.release_created }}
