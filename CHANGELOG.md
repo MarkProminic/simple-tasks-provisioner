@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.17](https://github.com/DominoVagrant/demo-tasks/compare/demo-tasks/v0.1.16...demo-tasks/v0.1.17) (2023-01-25)
+
+
+### Bug Fixes
+
+* remove Browser opening ([20d2e9c](https://github.com/DominoVagrant/demo-tasks/commit/20d2e9c8daf79d385b15ac2a6d29f5852fb71af2))
+
 ## [0.1.16](https://github.com/DominoVagrant/demo-tasks/compare/demo-tasks/v0.1.15...demo-tasks/v0.1.16) (2023-01-25)
 
 
