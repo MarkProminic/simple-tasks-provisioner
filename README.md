@@ -36,12 +36,12 @@
   * [Overview](#configuring-the-environment)
   * [Variables](#commonly-changed-parameters)
   * [Source Files](#source-files)
-* [Initialization](#starting-the-vm) 
+* [Initialization](#starting-the-vm)
   * [Access Methods](#accessing-the-domino-server)
     * [Web](#web-interface)
     * [Notes Client](#access-from-notes-client)
     * [Console](#domino-console)
-* [Common Issues](#common-problems) 
+* [Common Issues](#common-problems)
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
 * [License](#license)
@@ -50,7 +50,7 @@
 
 
 ## DominoVagrant
-Primary goal is to use Vagrant to deploy the latest Domino Server in an Linux VM. Vagrant and Role Specific Variables will be passed along, automating installation via the RestAPI interace and Mooneshine or other tools that support CRUD API calls. This uses a Specialized Packer Build that cuts down deployment time: 
+Primary goal is to use Vagrant to deploy the latest Domino Server in an Linux VM. Vagrant and Role Specific Variables will be passed along, automating installation via the RestAPI interace and Mooneshine or other tools that support CRUD API calls. This uses a Specialized Packer Build that cuts down deployment time:
 
 * **Template:** [Packer](https://app.vagrantup.com/STARTcloud/boxes/debian11-server)
 * **Build Source:** [Repo](Notyetavailableforpublicconsumption)
@@ -126,7 +126,7 @@ We will utilize APT to get the Virtualbox, Git,  and Vagrant installed.
 
 APT
 ```shell
-sudo apt-get install virtualbox vagrant git-core -y 
+sudo apt-get install virtualbox vagrant git-core -y
 ```
 
 ## Deployment
@@ -141,15 +141,15 @@ git clone https://github.com/DominoVagrant/demo-v2-task-based
 ### Configuring the Environment
 Once you have navigated into the projects directory. You will need to modify the Hosts.yml to your specific Environment.
 
-Please set the configuration file with the correct, Network and Memory and CPU settings your host machine will allow, as these may vary from system to system, I cannot predict your Machines CPU and Network Requirements. You will need to make sure that you do not over allocate CPU, and RAM. 
+Please set the configuration file with the correct, Network and Memory and CPU settings your host machine will allow, as these may vary from system to system, I cannot predict your Machines CPU and Network Requirements. You will need to make sure that you do not over allocate CPU, and RAM.
 
-##### Networking is setup to create one NAT adapter for Vagrant communications and one Bridged Adapter. 
-The bridge adapter needs to be specified or it will prompt upon deployment. 
+##### Networking is setup to create one NAT adapter for Vagrant communications and one Bridged Adapter.
+The bridge adapter needs to be specified or it will prompt upon deployment.
 Setting dhcp4 to true (ipv6 not yet fully supported try at your own risk) will pull a IP from your local network's DHCP server.
 
 ##### Secrets
 
-If you have any sensitive credentials, You will also need to create ```.secrets.yml``` in the root of the project. This is where you can store credentials variables that may contain sensitive data. this will prevent you from uploading them to the repo should you contribute back. Please note that if you remove this from the .gitignore you risk uploading sensitve data. 
+If you have any sensitive credentials, You will also need to create ```.secrets.yml``` in the root of the project. This is where you can store credentials variables that may contain sensitive data. this will prevent you from uploading them to the repo should you contribute back. Please note that if you remove this from the .gitignore you risk uploading sensitve data.
 
 ```
 cd demo-v2-task-based
@@ -174,7 +174,7 @@ nano Hosts.yml
 
 ### Modifying Roles
 The default provisioning engine is ansible-local. This allows us to template our variables into files before deploying and executing the installers.
-This allows us to set dynamic usernames, paths, passwords, etc. 
+This allows us to set dynamic usernames, paths, passwords, etc.
 
 #### Domino One-Touch References
 In order to make changes to the one touch installer. Modify the template file setup.json.j2 in the /templates folder of the role "domino-config".
@@ -235,14 +235,14 @@ or
 
 ### Web Interface
 
-The web interface of the server is here:  https://yourstaticordhcpip:443/downloads/welcome.html
+The web interface of the server is here: https://yourstaticordhcpip:443/downloads/welcome.html
 
 ### Access from Notes Client
 
 If you want to access the server from a Notes Client, you will need to cross-certify your ID.  To do this, first create a safe ID:
 1. Open User Security:
-	- MacOS:  HCL Notes > Security > User Security 
-	- Windows:  File > Security > User Security
+	- MacOS: HCL Notes > Security > User Security
+	- Windows: File > Security > User Security
 2. Select the Your Identity > Your Certificates tab
 3. Run Other Actions > Export NotesID Safe ID.  Do not set a password
 
@@ -257,7 +257,7 @@ Then you will need to create a connection document in your local Notes client.
 	1. In the Basic tab, set `Server name` as "demo/Demo" and check the `TCP/IP` checkbox
 	2. In the Advanced tab, set the `Destination server address` to "127.0.0.1:1352"
 	3. Click `Save & Close`
-	
+
 Then you can open a database on the server like this:
 1. File > Open > HCL Notes Application
 2. Enter "demo/DEMO" as the server name

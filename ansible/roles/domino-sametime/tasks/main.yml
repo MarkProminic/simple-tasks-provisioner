@@ -2,43 +2,44 @@
 ## Install Guide here: https://help.hcltechsw.com/sametime/12/admin/installing.html
 -
   name: "Creating installation directories for Sametime"
-  file:
+  ansible.builtin.file:
+    mode: '0644'
     path: "{{ item }}"
     state: directory
   with_items:
     - "{{ installer_dir }}/sametime/archives"
     - "{{ installer_dir }}/sametime/Sametime"
 
-- 
-  name: "Checking if Sametime {{ sametime_version }} installer is at {{ installer_dir }}/sametime/archives/{{ sametime_archive }}"
+-
+  name: "Checking if Sametime installer is at sametime/archives/{{ sametime_archive }}"
   register: sametime_installer_check
-  stat:
+  ansible.builtin.stat:
     path: "{{ installer_dir }}/sametime/archives/{{ sametime_archive }}"
-    get_md5: no
-
-- 
-  name: "Checking if Sametime {{ sametime_version }} is installed"
-  register: sametime_installed_check
-  stat:
-    path: "{{ completed_dir }}/sametime_installed"
-    get_md5: no
-
-#- 
-#  name: "Downloading Sametime {{ sametime_version }} from {{ domino_installer_base_url }}"
-#  register: sametimeresult
-#  until: "sametimeresult is not failed"
-#  retries: 3
-#  get_url:
-#    url: "{{ domino_installer_base_url }}/Sametime/{{ sametime_version }}/{{ sametime_archive }}"
-#    dest: "{{ installer_dir }}/sametime/archives/{{ sametime_archive }}"
-#    username: "{{ domino_installer_url_user }}"
-#    password: "{{ secrets.domino_installer_url_pass }}"
-#  when: sametime_installer_check.stat.exists == false and sametime_installed_check.stat.exists == false
+    get_md5: false
 
 -
-  name: "Extracting Sametime {{ sametime_version }} from {{ sametime_archive }}"
-  when:  sametime_installed_check.stat.exists == false
-  unarchive:
+  name: "Checking if Sametime is installed: {{ sametime_version }}"
+  register: sametime_installed_check
+  ansible.builtin.stat:
+    path: "{{ completed_dir }}/sametime_installed"
+    get_md5: false
+
+# -
+#   name: "Downloading Sametime from {{ domino_installer_base_url }}"
+#   register: sametimeresult
+#   until: "sametimeresult is not failed"
+#   retries: 3
+#   ansible.builtin.get_url:
+#     url: "{{ domino_installer_base_url }}/Sametime/{{ sametime_version }}/{{ sametime_archive }}"
+#     dest: "{{ installer_dir }}/sametime/archives/{{ sametime_archive }}"
+#     username: "{{ domino_installer_url_user }}"
+#     password: "{{ secrets.domino_installer_url_pass }}"
+#   when: not sametime_installer_check.stat.exists and not sametime_installed_check.stat.exists
+
+-
+  name: "Extracting Sametime from {{ sametime_archive }}"
+  when: not sametime_installed_check.stat.exists
+  ansible.builtin.unarchive:
     mode: "a+x"
     owner: "{{ domino_user }}"
     group: "{{ domino_group }}"
@@ -47,20 +48,19 @@
     creates: "{{ installer_dir }}/sametime/Sametime/Sametime-{{ sametime_version }}-for-domino-1201-linux"
     remote_src: true
 
-- 
+-
   name: "Stopping Domino for Sametime Installation"
-  when: sametime_installed_check.stat.exists == false
+  when: not sametime_installed_check.stat.exists
   become: true
-  service:
+  ansible.builtin.service:
     name: domino
     state: stopped
-    enabled: yes
+    enabled: true
 
 -
   name: "Configuring Sametime and Starting Service"
-  when: sametime_installed_check.stat.exists == false
-  when: false
-  shell: "{{ item }}"
+  when: not sametime_installed_check.stat.exists
+  ansible.builtin.shell: "{{ item }}"
   become: true
   args:
     executable: "/bin/bash"
@@ -69,21 +69,22 @@
     - ./install silent
     - touch {{ completed_dir }}/sametime_install
 
-- 
+-
   name: "Registering sametime installation Output"
-  shell: cat /var/log/volt_install_*.log
+  ansible.builtin.shell: cat /var/log/volt_install_*.log
   register: sametime_install
+  changed_when: false
 
-- 
+-
   name: "Outputting Sametime installation logs"
-  when: sametime_installed_check.stat.exists == false
-  debug: 
+  when: not sametime_installed_check.stat.exists
+  ansible.builtin.debug:
     var: sametime_install.stdout_lines
 
-- 
+-
   name: "Creating Database chatlogging for Sametime"
-  when: sametime_installed_check.stat.exists == false
-  mongodb_user:
+  when: not sametime_installed_check.stat.exists
+  community.mongodb.mongodb_user:
     login_user: "{{ mongodb_admin_user }}"
     login_password: "{{ mongodb_admin_password }}"
     login_port: "27017"
@@ -103,9 +104,9 @@
       - db: admin
         role: userAdminAnyDatabase
 
-- 
+-
   name: "Initializing Databases"
-  when: sametime_installed_check.stat.exists == false
+  when: not sametime_installed_check.stat.exists
   community.mongodb.mongodb_index:
     login_user: "{{ mongodb_admin_user }}"
     login_password: "{{ mongodb_admin_password }}"
@@ -126,35 +127,36 @@
           _id: 1
         state: present
 
-#- 
-#  name: "Initializing Databases"
-#  community.mongodb.mongodb_shell:
-#    mongo_cmd: mongosh
-#    db: chatlogging
-#    login_user: "{{ mongodb_admin_user }}"
-#    login_password: "{{ mongodb_admin_password }}"
-#    login_port: "27017"
-#    eval: "{{ item }}"
-#  with_items:
-#    - 'db.EVENTS.insertOne({"_id" : "dummy"})'
-#    - 'db.SESSIONS.insertOne({"_id" : "dummy"})'
+# -
+#   name: "Initializing Databases"
+#   community.mongodb.mongodb_shell:
+#     mongo_cmd: mongosh
+#     db: chatlogging
+#     login_user: "{{ mongodb_admin_user }}"
+#     login_password: "{{ mongodb_admin_password }}"
+#     login_port: "27017"
+#     eval: "{{ item }}"
+#   with_items:
+#     - 'db.EVENTS.insertOne({"_id" : "dummy"})'
+#     - 'db.SESSIONS.insertOne({"_id" : "dummy"})'
 
 -
 
   name: "Stopping MongoDB"
-  when: sametime_installed_check.stat.exists == false
+  when: not sametime_installed_check.stat.exists
   become: true
-  service:
+  ansible.builtin.service:
     name: mongod
     state: stopped
-    enabled: yes
+    enabled: true
 
-- 
+-
   name: "Binding to all interfaces and Setting Replication set in MongoDB"
-  lineinfile:
+  ansible.builtin.lineinfile:
+    mode: '0644'
     path: "{{ item.dir }}"
-    regexp:  "{{ item.regexp }}"
-    insertafter:  "{{ item.insertafter }}"
+    regexp: "{{ item.regexp }}"
+    insertafter: "{{ item.insertafter }}"
     create: true
     line: "{{ item.line }}"
   with_items:
@@ -162,18 +164,18 @@
     - { regexp: "  replSetName: rs0", insertafter: "replication:", line: '  replSetName: rs0', dir: "/etc/mongod.conf" }
     - { regexp: "  bindIpAll: true", insertafter: "bindIp: 127.0.0.1", line: '  bindIpAll: true', dir: "/etc/mongod.conf" }
 
-- 
+-
 
   name: "Starting MongoDB"
-  when: sametime_installed_check.stat.exists == false
-  service:
+  when: not sametime_installed_check.stat.exists
+  ansible.builtin.service:
     name: mongod
     state: started
-    enabled: yes
+    enabled: true
 
-- 
+-
   name: "Initializing Databases"
-  when: sametime_installed_check.stat.exists == false
+  when: not sametime_installed_check.stat.exists
   community.mongodb.mongodb_shell:
     mongo_cmd: mongosh
     db: admin
@@ -184,29 +186,30 @@
   with_items:
     - 'rs.initiate()'
 
-- 
+-
   name: "Ensuring replicaset rs0 exists"
-  when: sametime_installed_check.stat.exists == false
+  when: not sametime_installed_check.stat.exists
   community.mongodb.mongodb_replicaset:
     login_user: "{{ mongodb_admin_user }}"
     login_password: "{{ mongodb_admin_password }}"
     login_port: "27017"
     replica_set: rs0
     members: localhost:27017
-    validate: no
+    validate: false
 
-- 
+-
   name: "Starting Domino"
-  when: sametime_installed_check.stat.exists == false
-  service:
+  when: not sametime_installed_check.stat.exists
+  ansible.builtin.service:
     name: domino
     state: started
-    enabled: yes
+    enabled: true
 
 -
   name: "Setting Sametime to installed"
-  when: sametime_installed_check.stat.exists == False
-  file:
+  when: not sametime_installed_check.stat.exists
+  ansible.builtin.file:
+    mode: '0644'
     path: "{{ item }}"
     state: touch
   with_items:

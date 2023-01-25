@@ -6,4 +6,4 @@ LOG_FILE=vagrant_ssh.log
 
 vagrant ssh 2>&1 | tee $LOG_FILE
 
-echo "Log written to:  $LOG_FILE"
+echo "Log written to: $LOG_FILE"

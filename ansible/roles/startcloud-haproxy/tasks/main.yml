@@ -1,13 +1,15 @@
 ---
-- 
+-
   name: "Installing HAProxy and KeepAlived"
-  apt: 
-    pkg: 
+  ansible.builtin.apt:
+    pkg:
       - haproxy
       - keepalived
+
 -
   name: "Creating template and certifcate directories"
-  file:
+  ansible.builtin.file:
+    mode: '0644'
     path: "{{ item }}"
     state: directory
     owner: haproxy
@@ -20,7 +22,7 @@
   name: "Configuring haproxy"
   become: true
   tags: haproxy
-  template:
+  ansible.builtin.template:
     owner: "{{ item.owner }}"
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -44,9 +46,9 @@
     - { src: 'html/503.html.j2', dest: '/etc/haproxy/errors/html/503.html', owner: 'haproxy' }
     - { src: 'html/504.html.j2', dest: '/etc/haproxy/errors/html/504.html', owner: 'haproxy' }
 
-- 
+-
   name: "Starting service haproxy"
-  service: 
+  ansible.builtin.service:
     enabled: true
     name: haproxy
     state: restarted

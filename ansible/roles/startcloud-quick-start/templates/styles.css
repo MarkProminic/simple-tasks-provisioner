@@ -130,7 +130,7 @@ li {
     word-spacing: normal;
     position: relative;
     display: inline-block;
-    border-bottom: 1px dotted black; 
+    border-bottom: 1px dotted black;
 }
 
 .tooltip .tooltiptext {
@@ -166,7 +166,7 @@ li {
     position: absolute;
     z-index: 1;
     }
-    
+
 .tooltipnoborder:hover .tooltiptextcenter {
     visibility: visible;
 }

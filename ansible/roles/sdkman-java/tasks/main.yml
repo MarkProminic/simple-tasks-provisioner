@@ -1,8 +1,11 @@
 ---
   ## Do not quote the shell command below without reworking the command
-- 
-  name: "Get Java SDK version {{ java_version }} from SDKMAN"
-  shell: source {{ service_home_dir }}/.sdkman/bin/sdkman-init.sh && sdk list java | grep " 8.0.*-zulu" | grep -v "fx-" | sed 's/^.*\(8.0.[0-9]\+-zulu\)[ ]*$/\1/' | head -n 1
+-
+  name: "Extracting Java SDK version from SDKMAN: {{ java_version }}"
+  ansible.builtin.shell: |
+    set -o pipefail
+    source {{ service_home_dir }}/.sdkman/bin/sdkman-init.sh
+    sdk list java | grep " 8.0.*-zulu" | grep -v "fx-" | sed 's/^.*\(8.0.[0-9]\+-zulu\)[ ]*$/\1/' | head -n 1
   become: true
   become_user: "{{ service_user }}"
   args:
@@ -10,9 +13,9 @@
   register: computed_java_version
   when: "java_version  == 'LATEST'"
 
-- 
-  name: "Set Java SDK version {{ java_version }} from SDKMAN"
-  shell: "echo {{ java_version }}"
+-
+  name: "Setting Java SDK version from SDKMAN: {{ java_version }}"
+  ansible.builtin.shell: "echo {{ java_version }}"
   become: true
   become_user: "{{ service_user }}"
   args:
@@ -20,11 +23,11 @@
   register: selected_java_version
   when: "java_version != 'LATEST'"
 
-- 
-  name: "Installing Java {{ java_version }} via SDKMAN"
+-
+  name: "Installing Java via SDKMAN: {{ java_version }}"
   become: true
   become_user: "{{ service_user }}"
-  shell: >-
+  ansible.builtin.shell: >-
     . {{ sdkman_dir }}/bin/sdkman-init.sh &&
     sdk install java {{ computed_java_version.stdout }} {{ item.localpath | default('') }}
   args:
@@ -36,25 +39,26 @@
     sdk_install.rc != 0 and
     'is already installed.' not in sdk_install.stdout
 
-- 
-  name: "Adding Java to {{ service_user }} /etc/profile.d/java.sh"
-  lineinfile:
+-
+  name: "Adding Java to /etc/profile.d/java.sh for {{ service_user }}"
+  ansible.builtin.lineinfile:
+    mode: '0755'
     path: "{{ item.dir }}"
     regexp: "^PATH=\"$PATH:{{ service_home_dir }}/.sdkman/candidates/java/current/bin\""
     insertbefore: EOF
     create: true
     line: 'PATH=$PATH:{{ service_home_dir }}/.sdkman/candidates/java/current/bin'
   with_items:
-    - { user: "{{ service_user }}" , dir: "/etc/profile.d/java.sh" }
+    - { user: "{{ service_user }}", dir: "/etc/profile.d/java.sh" }
 
-- 
-  name: Update alternatives
-  alternatives:
+-
+  name: "Updating Java Alternatives"
+  community.general.alternatives:
     name: "{{ item.name }}"
     path: "{{ sdkman_dir }}/candidates/{{ item.candidate }}/current/bin/{{ item.name }}"
     link: "{{ item.link }}"
   loop: "{{ sdkman_update_alternatives }}"
-  become: yes
+  become: true
   when: ansible_os_family != 'Darwin'
   tags:
     - sdkman_privilege

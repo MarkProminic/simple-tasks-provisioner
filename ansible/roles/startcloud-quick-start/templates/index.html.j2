@@ -28,11 +28,11 @@
             </div>
             <div class="tooltip">
                 <a href="https://github.com/Moonshine-IDE/Genesis-Super.Human.Installer/issues" target="_blank" class="menu">Super.Human.Installer<i class="fa fa-bug" aria-hidden="true"></i></a>
-                <span class="tooltiptext">Open an Issue for SHI</span>     
+                <span class="tooltiptext">Open an Issue for SHI</span>
             </div>
             <div class="tooltip">
-                <a href="https://{{ settings.hostname }}.{{ settings.domain }}/generateBundle.XXX" target="_blank" class="menu"><i class="fa fa-ambulance" aria-hidden="true"></i></a>
-                <span class="tooltiptext">Generate Support Bundle</span>
+                <a href="/support-bundle.zip" target="_blank" class="menu"><i class="fa fa-ambulance" aria-hidden="true"></i></a>
+                <span class="tooltiptext">Support Bundle</span>
             </div>
         </div>
     </div>
@@ -100,7 +100,7 @@
                 {% if domino_url is defined %}
                 <li>
                     <a href="https://{{ domino_url }}" target="_blank">Domino</a>
-                </li>    
+                </li>
                 {% endif %}
                 {% if nomadweb_url is defined %}
                 <li>
@@ -193,7 +193,7 @@
             window.getSelection().removeAllRanges();
             if (x.style.display === "none") {
                         x.style.display = "inline";
-                        x.delay(5000).fadeOut(800); 
+                        x.delay(5000).fadeOut(800);
                     } else {
                         x.style.display = "none";
                     }

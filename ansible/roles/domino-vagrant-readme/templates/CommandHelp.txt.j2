@@ -16,7 +16,7 @@
         "screen -r" to resume screen session
     Service)
         "sudo service domino restart"
-    
+
 
 3) Issue Domino commands
     help
@@ -32,8 +32,8 @@
 
 4) Retrieve the user.id from {{ service_home_dir }}/user.id via:
     1.HTTP: https://{{ ansible_all_ipv4_addresses[0] }}/downloads
-    2.SFTP/SCPing 
-    
+    2.SFTP/SCPing
+
     The user.id password is the one defined in the setup.json which is currently 'password'
     You can know use this user.id in a Notes, Administrator or Designer Client.
 
@@ -42,17 +42,17 @@
 -----------------------------------------------------------------------------
 
 Run this command ONCE after creating a fresh instance to generate {{ service_home_dir }}/names.nsf:
-- Set the java_helper_application_install variable to true in your Hosts.yaml
-- run vagrant provision. This will:
-        Create a fresh names database:  `cd {{ service_home_dir }}; java -jar ./CreateNamesDatabase.jar`
+-Set the java_helper_application_install variable to true in your Hosts.yaml
+-run vagrant provision. This will:
+        Create a fresh names database: `cd {{ service_home_dir }}; java -jar ./CreateNamesDatabase.jar`
         Password is the one defined in the setup.json which is currently "{{ domino_admin_notes_id_password }}"
 
 Accesst the server via "vagrant ssh"
 Test stand-alone Java API operations:
-- Verify user:                    
+-Verify user:
     `cd {{ service_home_dir }}; java -jar ./CheckNotesUser.jar`
 
-- Verify connection to database:  
+-Verify connection to database:
     `cd {{ service_home_dir }}; java -jar ./CheckDatabase.jar <server> <database>`
 
 Source code and build scripts are located in the VM here:

@@ -1,11 +1,11 @@
 #jinja2:lstrip_blocks: True
---- 
-network: 
-  ethernets: 
+---
+network:
+  ethernets:
     public_adapter:
       accept-ra: false
     {% if not networks[0].dhcp4%}
-      addresses: 
+      addresses:
         - {{ networks[0].address }}/24
       routes:
         - to: default
@@ -14,10 +14,10 @@ network:
       dhcp-identifier: mac
       dhcp4: {{ networks[0].dhcp4 }}
       dhcp6: {{ networks[0].dhcp6 }}
-      match: 
+      match:
         macaddress: {{ macaddress.stdout }}
-      nameservers: 
-        addresses: 
+      nameservers:
+        addresses:
           - {{ networks[0].dns[0]['nameserver'] }}
           - {{ networks[0].dns[1]['nameserver'] }}
       set-name: public_adapter

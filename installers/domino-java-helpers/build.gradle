@@ -16,7 +16,7 @@ if (!(new File(notesInstallation).exists())) {
 	// try this as a Linux environment instead
 	notesInstallation = '/opt/hcl/domino/notes/latest/linux'
 }
-// TODO:  try Windows
+// TODO: try Windows
 if (!(new File(notesInstallation).exists())) {
 	throw new GradleException("Invalid configured path for Notes installation ($notesInstallation).  Check notesInstallation in build.gradle.")
 }
@@ -31,7 +31,7 @@ if (!envPath) {
 // change envPath as needed
 if (notesInstallation.toLowerCase().startsWith('/applications/')) { // treat as macOS
 	if (!(new File(notesJarPath).exists())) {
-		// alternative location for macOS:  /Applications/HCL Notes.app/Contents/Resources/jvm/lib/ext/Notes.jar 
+		// alternative location for macOS: /Applications/HCL Notes.app/Contents/Resources/jvm/lib/ext/Notes.jar
 		logger.info "Notes.jar not found at $notesJarPath"
 		notesJarPath = "$notesInstallation/../Resources/jvm/lib/ext/Notes.jar"
 	}
@@ -39,7 +39,7 @@ if (notesInstallation.toLowerCase().startsWith('/applications/')) { // treat as 
 		logger.info "Notes.jar not found at $notesJarPath"
 		throw new GradleException("ERROR: Could not find Notes.jar")
 	}
-	println("Notes JAR path:  $notesJarPath")
+	println("Notes JAR path: $notesJarPath")
 }
 else { // treat as Windows
 	// update PATH
@@ -49,7 +49,7 @@ else { // treat as Windows
 
 // build a jar path to use for Notes.jar
 // Supports local and Linux server executions
-String jarClassPath = "./Notes.jar /opt/hcl/domino/notes/latest/linux/jvm/lib/ext/Notes.jar ${notesJarPath.replaceAll(' ', '%20').replaceAll('^\\w+:', '/$0')}" 
+String jarClassPath = "./Notes.jar /opt/hcl/domino/notes/latest/linux/jvm/lib/ext/Notes.jar ${notesJarPath.replaceAll(' ', '%20').replaceAll('^\\w+:', '/$0')}"
 
 logger.debug "Environment"
 System.env.each {
@@ -63,7 +63,7 @@ sourceSets {
     main {
         java {
             srcDirs = ['src/main/java']
-            
+
             // The servlet requires additional dependencies that are not available with the Notes client
             exclude '**/ExampleServlet*'
         }
@@ -81,7 +81,7 @@ dependencies {
 }
 
 /*
-OPTIONAL:  Configuration to let this build and run in Moonshine
+OPTIONAL: Configuration to let this build and run in Moonshine
 Use "clean runApp" for the Gradle command
 */
 task runApp(type: JavaExec) {
@@ -89,7 +89,7 @@ task runApp(type: JavaExec) {
 	main = mainClassName  // deprecated in later versions of Gradle - use mainClass
 	environment('DYLD_LIBRARY_PATH', notesInstallation)
 	environment('PATH', envPath)
-	
+
 	// args 'appArg1'
 }
 
@@ -98,7 +98,7 @@ task runApp(type: JavaExec) {
  * Build a fat jar (excluding Notes.jar) for import into script library.
  */
 jar {
-	from { 
+	from {
 		// runtimeClasspath includes implementation and runtimeOnly dependencies
 		// findResults allows using null to exclude results
 		configurations.runtimeClasspath.findResults { File dependency ->
@@ -106,9 +106,9 @@ jar {
 				return null  // skip this entry
 			}
 			else {
-				return dependency.isDirectory() ? dependency : zipTree(dependency) 
+				return dependency.isDirectory() ? dependency : zipTree(dependency)
 			}
-		} 
+		}
 	}
 	// classpath needs to be specified in individual tasks
 }
@@ -121,7 +121,7 @@ task jarCheckNotesUser(type: Jar) {
 	archiveName = "${mainClass}.jar"
 	manifest {
 		attributes 'Main-Class': "net.prominic.domino/vagrant/$mainClass",
-				'Class-Path': jarClassPath 
+				'Class-Path': jarClassPath
 	}
 	with jar
 }
@@ -129,7 +129,7 @@ task jarCheckNotesUser(type: Jar) {
 task jarIndividual() {
 	// placeholder for generated tasks
 }
-	
+
 // generate tasks to create individual jars
 String jarIndividualDir = project.findProperty('jarIndividualDir') ?: 'src/main/java/net/prominic/domino/vagrant'
 new File(jarIndividualDir).eachFileRecurse groovy.io.FileType.FILES, {File curFile ->
@@ -145,28 +145,28 @@ new File(jarIndividualDir).eachFileRecurse groovy.io.FileType.FILES, {File curFi
 			String curTaskName = "jar$mainClass"
 			// don't override the existing task if it exists - allow this so that the user can define a custom override
 			if (!tasks.findByName(curTaskName)) {
-				println "Creating task:  '$curTaskName'"
+				println "Creating task: '$curTaskName'"
 				tasks.create(name: curTaskName, type: Jar) {
 					archiveName = "${mainClass}.jar"
 					manifest {
 						attributes 'Main-Class': "net.prominic.domino/vagrant/$mainClass",
-								'Class-Path': jarClassPath 
+								'Class-Path': jarClassPath
 					}
 					with jar
 				}
 			}
 			else {
-				println "Using existing task:  '$curTaskName'"
+				println "Using existing task: '$curTaskName'"
 			}
 			tasks.getByName('jarIndividual').dependsOn << curTaskName
 
 
 		}
 		else {
-			println "Skipping non-main class:  ${curFile.getAbsolutePath()}"
+			println "Skipping non-main class: ${curFile.getAbsolutePath()}"
 		}
 	}
 	else {
-		println "Ignoring invalid class file:  ${curFile.getAbsolutePath()}"
+		println "Ignoring invalid class file: ${curFile.getAbsolutePath()}"
 	}
 }

@@ -1,15 +1,23 @@
 ---
-# tasks file for ansible-sdkman
+-
+  name: "Installing SDKMAN"
+  ansible.builtin.include_tasks: install.yml
 
-- name: Install SDKMAN
-  include_tasks: install.yml
+-
+  name: "Installing SDKMAN"
+  environment:
+    SDKMAN_DIR: '{{ sdkman_dir }}'
+    SDKMAN_OFFLINE_MODE: 'false'
+  become: '{{ service_user != ansible_user_id }}'
+  become_user: '{{ service_user }}'
+  block:
+    -
+      name: "Running SDKMAN tasks"
+      ansible.builtin.include_tasks: sdkman.yml
 
-- block:
-    - name: Run SDKMAN tasks
-      include_tasks: sdkman.yml
-
-    - name: Persist additional SDKMAN environment variables
-      include_tasks: persist_env.yml
+    -
+      name: "Persisting additional SDKMAN environment variables"
+      ansible.builtin.include_tasks: persist_env.yml
       loop:
         - .bash_profile
         - .profile
@@ -17,19 +25,15 @@
         - .zshrc
       loop_control:
         loop_var: sdkman_profile
-  environment:
-    SDKMAN_DIR: '{{ sdkman_dir }}'
-    SDKMAN_OFFLINE_MODE: 'false'
-  become: '{{ service_user != ansible_user_id }}'
-  become_user: '{{service_user }}'
 
-- name: Update alternatives
-  alternatives:
+-
+  name: "Updating alternatives"
+  community.general.alternatives:
     name: "{{ item.name }}"
     path: "{{ sdkman_dir }}/candidates/{{ item.candidate }}/current/bin/{{ item.name }}"
     link: "{{ item.link }}"
   loop: "{{ sdkman_update_alternatives }}"
-  become: yes
+  become: true
   when: ansible_os_family != 'Darwin'
   tags:
     - sdkman_privilege

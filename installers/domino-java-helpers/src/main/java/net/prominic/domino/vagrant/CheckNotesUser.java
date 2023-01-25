@@ -23,7 +23,7 @@ public class CheckNotesUser {
             if (args.length >= 3) {
                 docID = args[2];
             }
-            
+
             checkNotesUser(notesIDPath, databaseName, docID);
         }
         catch (Throwable throwable) {
@@ -42,7 +42,7 @@ public class CheckNotesUser {
     public static void checkNotesUser(String notesIDPath, String databaseName, String docID) throws Exception {
         try {
             NotesThread.sinitThread();
-            
+
             // build the session arguments
             String[] args = null;
             if (null == notesIDPath || notesIDPath.trim().equals("")) {
@@ -57,19 +57,19 @@ public class CheckNotesUser {
 
 //            Session session = NotesFactory.createSession("localhost", args, "", "");
             Session session = NotesFactory.createSession(null, args, null, null);
-            System.out.println("Running on Notes Version:  '" + session.getNotesVersion() + "'.");
-            
-            
+            System.out.println("Running on Notes Version: '" + session.getNotesVersion() + "'.");
+
+
             // start running tests with the session
-            
+
             String username = session.getUserName();
-            System.out.println("Notes User Name:  '" + username + "'.");
-            
+            System.out.println("Notes User Name: '" + username + "'.");
+
             // user-friendly name
             Name userNameObject = session.getUserNameObject();
             try {
                 String outputName = userNameObject.getAbbreviated();
-                System.out.println("Cleaned-up Notes User Name:  '" + outputName + "'.");
+                System.out.println("Cleaned-up Notes User Name: '" + outputName + "'.");
             }
             finally {
                 if (null != userNameObject) {
@@ -80,7 +80,7 @@ public class CheckNotesUser {
 
 
             if (null != databaseName && !databaseName.trim().equals("")) {
-                
+
                 Database database = session.getDatabase("", databaseName, false);
                 Document document = null;
                 try {
@@ -96,7 +96,7 @@ public class CheckNotesUser {
                         if (null == document) {
                             throw new Exception("Could not find document with ID '" + docID + "' in database '" + database + "'.");
                         }
-                        System.out.println("Testing a document sign operation on a '" + 
+                        System.out.println("Testing a document sign operation on a '" +
                                            document.getItemValueString("Form") + "' document.");
                         document.sign();
                     }
@@ -116,11 +116,11 @@ public class CheckNotesUser {
         catch (Throwable ex) {
         		ex.printStackTrace();
         		throw ex;
-        }        
+        }
         finally {
             NotesThread.stermThread();
         }
-        
+
     }
 
 }

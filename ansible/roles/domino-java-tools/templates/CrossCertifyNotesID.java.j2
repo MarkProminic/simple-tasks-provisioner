@@ -26,82 +26,82 @@ https://help.hcltechsw.com/dom_designer/12.0.0/basic/H_CROSSCERTIFY_METHOD_JAVA.
 public class CrossCertifyNotesID
 {
 	public static final String AUTHORIZED_GROUP = "AutomaticallyCrossCertifiedUsers";
-	
-	
+
+
 	protected static final String DEFAULT_SUCCESS_FILE = "/tmp/CrossCertifyNotesID.out";
 	protected static String successFileName = DEFAULT_SUCCESS_FILE;
-	
+
 	protected static final String DEFAULT_PROPERTIES_FILE = "CrossCertifyNotesID.properties";
 	protected static String dataDirectory = null;
 	protected static String certID = null;
 	protected static String settingsFile = null;
 	protected static String aclTemplate = null;
 	protected static boolean debugMode = true;
-	
+
 	public static void main(String args[])
 	{
 		log("Starting cross-certification tool.");
-		
+
 		FileInputStream fis = null;
 		boolean threadInitialized = false;
 		Session session = null;
 		try {
-			
+
 			// load properties
 			loadProperties();
-			
+
 			// clear the file that indicates success
 			File successFile = new File(successFileName);
 			if (successFile.exists()) {
 				successFile.delete();
 			}
-			
+
 			if (args.length < 1) {
 				throw new Exception("No ID file specified.");
 			}
-			String targetID = args[0]; // TODO:  support more files
-			
+			String targetID = args[0]; // TODO: support more files
+
 			// The JSON file used for Domino server setup can also be used for for this configuration
 			fis = new FileInputStream(settingsFile);
 			JSONObject json = (JSONObject)new JSONTokener(fis).nextValue();
-			
+
 			// extract the values
-			// TODO:  add more validation if it becomes a problem. This code could easily trigger NullPointerExceptions if the format is invalid
+			// TODO: add more validation if it becomes a problem. This code could easily trigger NullPointerExceptions if the format is invalid
 			JSONObject serverSetup = json.getJSONObject("serverSetup");
 			JSONObject serverConfig = serverSetup.getJSONObject("server");
 			String name = serverConfig.getString("name");
 			String org = serverConfig.getString("domainName");
 			String server = name + "/" + org;
-			
+
 			String certPassword = serverSetup.getJSONObject("org").getString("certifierPassword");
-			
+
 			// currently we are using the admin user for actions like this
 			String userPassword = serverSetup.getJSONObject("admin").getString("password");
-			
-			
-			
+
+
+
 			// initialize the session
 			debug("NotesThread.sinitThread()");
 			NotesThread.sinitThread();
 			threadInitialized = true;
-				
+
 			 // build the session arguments
 			String[] sessionArgs = null;
 			log("Using default notesID path.");
 			sessionArgs = new String[0];
-		
+
 			 //Session session = NotesFactory.createSession("localhost", args, "", "");
 			//Session session = NotesFactory.createSession(null, args, null, null);
 			String sessionServer = null; // local server
 			String sessionUser = null;  // default user
 			debug("NotesFactory.createSession");
 			session = NotesFactory.createSession(sessionServer, args, sessionUser, userPassword);
-			log("Running on Notes Version:  '" + session.getNotesVersion() + "'.");
-			
+			log("Running on Notes Version: '" + session.getNotesVersion() + "'.");
+
 			String userName = crossCertify(session, targetID, server, certID, certPassword);
-				
+
 			log( "crossCertifyNotesID() completed.");
-			
+
 			// add the user to an authorized group
 			if (null != userName) {
 				addUserToAuthorizedGroup(session, userName, server, userPassword);
@@ -111,8 +111,8 @@ public class CrossCertifyNotesID
 			else {
 				log("Could not detect user from safe ID.");
 			}
-			
-			
+
+
 			log("");
 			log("## All operations completed successfully. ##");
 			// Create an output file to indicate that the action was succesful.
@@ -126,13 +126,13 @@ public class CrossCertifyNotesID
 		}
 		finally {
 			try {
-				if (null != session) { 
+				if (null != session) {
 					debug("session.recycle()");
-					session.recycle(); 
+					session.recycle();
 				}
-				if (threadInitialized) { 
+				if (threadInitialized) {
 					debug("NotesThread.stermThread()");
-					NotesThread.stermThread(); 
+					NotesThread.stermThread();
 				}
 				if (null != fis) { fis.close(); }
 			}
@@ -141,7 +141,7 @@ public class CrossCertifyNotesID
 			}
 		}
 	}
-	
+
 	/**
 	 * Load the application properties, from the first available source here:<ul>
 	 *   <li>The file configured by the <code>app.properties.file</code> property (set with <code>-Dapp.properties.file=%file%</code>)</li>
@@ -150,13 +150,13 @@ public class CrossCertifyNotesID
 	 * </ul>
 	 */
 	public static void loadProperties() {
-		
+
 		String propertiesFileName = System.getProperty("app.properties.file");
 		debug ("propertiesFileName='" + propertiesFileName + "'.");
 		if (null == propertiesFileName || propertiesFileName.isEmpty()) {
 			propertiesFileName = DEFAULT_PROPERTIES_FILE;
 		}
-		
+
 		Properties properties = new Properties();
 		File propertiesFile = new File(propertiesFileName);
 		if (propertiesFile.exists()) {
@@ -170,9 +170,9 @@ public class CrossCertifyNotesID
 				log("Could not load properties file '" + propertiesFile.getAbsolutePath() + "'.  Using defaults..." );
 			}
 			finally {
-				if (null != fis) { 
+				if (null != fis) {
 					try {
-						fis.close(); 
+						fis.close();
 					}
 					catch (Exception ex) {
 						// ignore
@@ -183,7 +183,7 @@ public class CrossCertifyNotesID
 		else {
 			log("Properties file '" + propertiesFile.getAbsolutePath() + "' does not exist.  Using defaults...");
 		}
-		
+
 		// read the properties
 		dataDirectory = properties.getProperty("data.directory", "/local/notesdata");
 		settingsFile = properties.getProperty("domino.setup.file", dataDirectory + "/setup.json");
@@ -197,11 +197,11 @@ public class CrossCertifyNotesID
 		else {
 			debugMode = false;
 		}
-		
+
 	}
-	
-	
-	
+
+
+
 	/**
 	 * Cross-certify the given targetID for the given server.
 	 * @param session  the Domino Session
@@ -214,8 +214,8 @@ public class CrossCertifyNotesID
 	 * @throws Exception if the cross-certification failed
 	 */
 	public static String crossCertify(Session session, String targetID, String server, String certID, String certPassword)  throws Exception {
-		log("Signing ID:  '" + targetID + "'.");
-		
+		log("Signing ID: '" + targetID + "'.");
+
 		Registration reg = null;
 		DateTime dt = null;
 		try {
@@ -225,33 +225,33 @@ public class CrossCertifyNotesID
 			reg.setRegistrationServer( server);
 			debug("Registration.setCertifierIDFile('" + server + "')");
 			reg.setCertifierIDFile( certID);
-			
-			
-						
+
+
+
 			debug("session.createDateTime()");
 			dt = session.createDateTime("Today");
 			dt.setNow();
-			dt.adjustYear(1);	 
+			dt.adjustYear(1);
 			reg.setExpiration(dt);
-			
-			// NOTE:  crossCertify triggers a password check even with an authenticated session, if the ID file has a password
-			// I see this behavior is specifically noted for the recertify method, but not crossCertify:  https://help.hcltechsw.com/dom_designer/12.0.0/basic/H_RECERTIFY_METHOD_JAVA.html
+
+			// NOTE: crossCertify triggers a password check even with an authenticated session, if the ID file has a password
+			// I see this behavior is specifically noted for the recertify method, but not crossCertify: https://help.hcltechsw.com/dom_designer/12.0.0/basic/H_RECERTIFY_METHOD_JAVA.html
 			// Enter the password from the command prompt, or automate it using the "yes" command
 			debug("Registration.crossCertify(...)");
-			if (reg.crossCertify(targetID, 
+			if (reg.crossCertify(targetID,
 				certPassword, // certifier password
 				"programmatically cross certified")) // comment field
-			{ 
-				log("Cross-certification succeeded"); 
-				
+			{
+				log("Cross-certification succeeded");
+
 				// Lookup the cross-certification document to check the user name
 				// I haven't found a better way to do this.
 				return getLastCrossCertifiedUser(session, server);
 			}
-			else { 
+			else {
 				throw new Exception("Registration.crossCertify reported failure");
 			}
-		} 
+		}
 //		catch(NotesException e) {
 //			log( e.id + " " + e.text);
 //			log(e);
@@ -262,17 +262,17 @@ public class CrossCertifyNotesID
 				if (null != reg) { reg.recycle(); }
 			}
 			catch (NotesException ex) {
-				log("NotesException on recycle:  ");
+				log("NotesException on recycle: ");
 				log(ex);
 			}
-		}	
+		}
 	}
-	
+
 	/**
 	 * Get the last cross-certified user in names.nsf on the given server.
 	 * I don't see a better way to extract the username from a Notes ID for now.
 	 * Note that this agent won't throw an Exception.
-	 * 
+	 *
 	 * @param session  the existing session
 	 * @param server  the target server
 	 * @return the username, or <code>null</code> if no valid user was found.
@@ -287,7 +287,7 @@ public class CrossCertifyNotesID
 			if (null == namesDatabase || !namesDatabase.isOpen()) {
 				throw new Exception("Could not open names.nsf");
 			}
-			
+
 			debug("namesDatabase.getView()");
 			certView = namesDatabase.getView("($CrossCertByName)");
 			if (null == certView) {
@@ -297,7 +297,7 @@ public class CrossCertifyNotesID
 			certView.refresh();   // avoid race conditions on view population
 			debug("certView.setAutoUpdate(false)");
 			certView.setAutoUpdate(false);  // avoid updates in the middle of iteration
-			
+
 			debug("certView.getAllEntries()");
 			entries = certView.getAllEntries();
 			debug("ViewEntryCollection.getFirstEntry()");
@@ -314,7 +314,7 @@ public class CrossCertifyNotesID
 						debug("Document.getItemValueString(IssuedTo)");
 						String issuedTo = curDoc.getItemValueString("IssuedTo");
 						dateTime = curDoc.getLastModified();
-						
+
 						if (null == issuedTo || issuedTo.trim().isEmpty()) {
 							debug("Document.getUniversalID()");
 							log("Found cross-certificate document " + curDoc.getUniversalID() + " with no value for IssuedTo.");
@@ -325,9 +325,9 @@ public class CrossCertifyNotesID
 							userName = issuedTo;
 							latestDate = dateTime.toJavaDate();
 						}
-						
-						
-						
+
+
+
 					}
 					// not a document
 				}
@@ -335,21 +335,21 @@ public class CrossCertifyNotesID
 					ViewEntry prevEntry = curEntry;
 					debug("ViewEntry.getNextEntry()");
 					curEntry = entries.getNextEntry();
-					
+
 					// cleanup
 					if (null != dateTime) { dateTime.recycle(); }
 					if (null != curDoc) { curDoc.recycle(); }
 					prevEntry.recycle();
 				}
 			}
-			
+
 			if (null == userName || userName.trim().isEmpty()) {
 				return null;  // normallize the output
 			}
 			return userName;
 		}
 		catch (Exception ex) {
-			log("Failed to read last cross-certified user:  ");
+			log("Failed to read last cross-certified user: ");
 			log(ex);
 			return null;
 		}
@@ -366,12 +366,12 @@ public class CrossCertifyNotesID
 				}
 			}
 			catch (NotesException ex) {
-				log("Failed to recycle objects:  ");
+				log("Failed to recycle objects: ");
 				log(ex);
 			}
 		}
 	}
-	
+
 	/**
 	 * Add the given username to the {@link #AUTHORIZED_GROUP} group on the target server.
 	 * @param session  the Domino session to use.
@@ -385,41 +385,41 @@ public class CrossCertifyNotesID
 		View groupView = null;
 		Document groupDoc = null;
 		Vector members = null;
-		
+
 		try {
-			
+
 			debug("session.getDatabase(names.nsf)");
 			namesDatabase = session.getDatabase(server, "names.nsf", false);
 			if (null == namesDatabase || !namesDatabase.isOpen()) {
 				throw new Exception("Could not open names.nsf");
 			}
-			
+
 			debug("namesDatabase.getView(Groups)");
 			groupView = namesDatabase.getView("Groups");
 			if (null == groupView) {
 				throw new Exception("Could not open group view.");
 			}
-			
+
 			debug("groupView.getDocumentByKey('" + AUTHORIZED_GROUP + "'");
 			groupDoc = groupView.getDocumentByKey(AUTHORIZED_GROUP, true);
 			if (null == groupDoc) {
-				throw new Exception("Could not find expected group document:  '" + AUTHORIZED_GROUP + "'.");
+				throw new Exception("Could not find expected group document: '" + AUTHORIZED_GROUP + "'.");
 			}
-			
+
 			debug("groupDoc.getItemValue(Members)");
 			members = groupDoc.getItemValue("Members");
 			if (null == members || members.size() == 0 ||
 			    (members.size() == 1 && members.get(0).toString().trim().isEmpty())) { // default blank entry
-				members = new Vector();  // normalize 	
+				members = new Vector();  // normalize
 			}
 			members.add(username);
 			debug("groupDoc.replaceItemValue(Members)");
 			groupDoc.replaceItemValue("Members", members);
-			
+
 			// computeWithForm - is this required?
 			debug("groupDoc.computeWithForm()");
 			groupDoc.computeWithForm(false, true);
-			
+
 			// save
 			debug("groupDoc.save()");
 			if (!groupDoc.save(true)) { // force the save
@@ -428,7 +428,7 @@ public class CrossCertifyNotesID
 			else {
 				log("Authorized group has been updated.");
 			}
-			
+
 			// force refresh of ($ServerAccess)
 			View refreshView = null;
 			String viewName = "($ServerAccess)";
@@ -449,7 +449,7 @@ public class CrossCertifyNotesID
 			finally {
 				if (null != refreshView) { refreshView.recycle(); }
 			}
-			
+
 			session.recycle(members);
 		}
 		finally {
@@ -458,12 +458,12 @@ public class CrossCertifyNotesID
 			if (null != groupView) { groupView.recycle();}
 			if (null != namesDatabase) { namesDatabase.recycle();}
 		}
-		
+
 	}
 
 	/**
 	 * Add the given username to the server document, with enough access for DXL Importer and agents to work.
-	 * TODO:  This is massive overkill - it should be controlled by the group instead.   
+	 * TODO: This is massive overkill - it should be controlled by the group instead.
 	 * However, the group was not working in our recent tests, so I'm using this as a workaround for now.'
 	 * @param session  the Domino session to use
 	 * @param username the username to add
@@ -475,36 +475,36 @@ public class CrossCertifyNotesID
 		View serverView = null;
 		Document serverDoc = null;
 		Name nameObj = null;
-		
+
 		try {
-			
+
 			debug("session.getDatabase(names.nsf)");
 			namesDatabase = session.getDatabase(server, "names.nsf", false);
 			if (null == namesDatabase || !namesDatabase.isOpen()) {
 				throw new Exception("Could not open names.nsf");
 			}
-			
+
 			debug("namesDatabase.getView($Servers)");
 			serverView = namesDatabase.getView("($Servers)");
 			if (null == serverView) {
 				throw new Exception("Could not open server view.");
 			}
-			
+
 			debug("session.createName()");
 			nameObj = session.createName(server);
 			debug("nameObj.getCanonical()");
 			String key = nameObj.getCanonical();
-			
+
 			debug("serverView.getDocumentByKey('" + key + "'");
 			serverDoc = serverView.getDocumentByKey(key, true);
 			if (null == serverDoc) {
-				throw new Exception("Could not find expected server document:  '" + server + "'.");
+				throw new Exception("Could not find expected server document: '" + server + "'.");
 			}
-			
+
 			// Track if any of the fields are update.
 			// This will support rerunning the agent for the same ID.
 			boolean updated = false;
-			
+
 			// update the security fields
 			updated = updateServerSecurityField(serverDoc, "FullAdmin", username) ? true : updated;
 			updated = updateServerSecurityField(serverDoc, "CreateAccess", username) ? true : updated;
@@ -515,12 +515,12 @@ public class CrossCertifyNotesID
 			updated = updateServerSecurityField(serverDoc, "RestrictedList", username) ? true : updated;
 			// Updating AllowAccess breaks all access to the server, including the admin user.  I suspect I need to set additional related fields.
 			//updateServerSecurityField(serverDoc, "AllowAccess", server);
-			
+
 			// computeWithForm - is this required?
-			// This fails with an error like:  
+			// This fails with an error like:
 			// [018455:000002-00007FCD65B93700] ECL Alert Result: Code signed by Domino Template Development/Domino was prevented from executing with the right: Access to current database.NotesException: Operation aborted at your request
 			//serverDoc.computeWithForm(false, true);
-			
+
 			// save
 			if (!updated) {
 				// If the document is not updated, saving will trigger an error
@@ -532,7 +532,7 @@ public class CrossCertifyNotesID
 			else {
 				log("Server doc has been updated.");
 			}
-			
+
 			// also update the ACL to give the user access to configure the server.
 			updateNamesACL(namesDatabase, username);
 		}
@@ -542,9 +542,9 @@ public class CrossCertifyNotesID
 			if (null != serverView) { serverView.recycle();}
 			if (null != namesDatabase) { namesDatabase.recycle();}
 		}
-		
+
 	}
-	
+
 	/**
 	 * Add the given userName to the indicated item in the given document.
 	 * Handle duplicates and empty existing values
@@ -555,13 +555,13 @@ public class CrossCertifyNotesID
 	protected static boolean updateServerSecurityField(Document serverDoc, String itemName, String userName) throws NotesException {
 		Vector members = null;
 		try {
-			
+
 			members = serverDoc.getItemValue(itemName);
 			if (null == members || members.size() == 0 ||
 			    (members.size() == 1 && members.get(0).toString().trim().isEmpty())) { // default blank entry
-				members = new Vector();  // normalize 	
+				members = new Vector();  // normalize
 			}
-			
+
 			if (!members.contains(userName)) {
 				members.add(userName);
 				debug("serverDoc.replaceItemValue('" + itemName + "', " + members + ")");
@@ -569,7 +569,7 @@ public class CrossCertifyNotesID
 				return true;
 			}
 			return false;
-			
+
 		}
 		finally {
 			if (null != members) {
@@ -577,9 +577,9 @@ public class CrossCertifyNotesID
 				serverDoc.recycle(members);
 			}
 		}
-		
+
 	}
-	
+
 	/**
 	 * Add an ACL entry for the user in the given database.
 	 * The user will have Manager access with all roles.
@@ -594,7 +594,7 @@ public class CrossCertifyNotesID
 		try {
 			debug("namesDatabase.getACL()");
 			acl = database.getACL();
-			
+
 			fis = new FileInputStream(aclTemplate);
 			JSONObject json = (JSONObject)new JSONTokener(fis).nextValue();
 /* Example JSON:
@@ -603,7 +603,7 @@ public class CrossCertifyNotesID
   "type": "person",
   "canDeleteDocuments": true,
   "canReplicateOrCopyDocuments": true,
-  "roles": [ 
+  "roles": [
     "GroupCreator",
     "GroupModifier",
     "NetCreator",
@@ -619,7 +619,7 @@ public class CrossCertifyNotesID
 }
 */
 			updated = updateACLFromConfig(acl, json, userName);
-			
+
 			if (!updated) {
 				log("No ACL updates required.");
 			}
@@ -628,18 +628,18 @@ public class CrossCertifyNotesID
 				debug("acl.save()");
 				acl.save();
 			}
-			
+
 		}
 		finally {
 			if (null != acl) { acl.recycle(); }
 			if (null != fis) { fis.close(); }
 		}
-		
+
 		return updated;
-		
+
 
 	}
-	
+
 	/**
 	 * Update the ACL to match the provided configuration.
 	 * Adapted from 	https://github.com/DominoGenesis/Genesis/blob/bde62b70bcd0fef35c41117a87daedba4b80a6f6/src/main/java/net/prominic/genesis/JSONRules.java#L534-L704
@@ -821,7 +821,7 @@ public class CrossCertifyNotesID
 			if (config.has("roles")) {
 				debug("acl.getRoles()");
 				Vector<?> aclRoles = acl.getRoles();
-				log("Valid ACL Roles:  ");
+				log("Valid ACL Roles: ");
 				for (Object aclRole : aclRoles) {
 					log("  " + aclRole.toString());
 				}
@@ -849,20 +849,20 @@ public class CrossCertifyNotesID
 
 		log("ACL Updates complete.");
 		return toSave;
-	}	
-	
-	
-	
+	}
+
+
+
 	protected static void log(String message) {
 		System.out.println(message);
-	} 	
+	}
 	protected static void debug(String message) {
 		final String debugPrefix = "    (debug)";
 		if (debugMode) {
 			log(debugPrefix + message);
 		}
-	} 	
+	}
 	protected static void log(Throwable t) {
 		t.printStackTrace(System.out);
-	} 	
+	}
 }

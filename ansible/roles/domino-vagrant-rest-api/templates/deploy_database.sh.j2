@@ -1,14 +1,14 @@
 #!/bin/bash
-# USAGE:  ./deploy_database.sh <temp-database-path> <target-database-name-and-path>
+# USAGE: ./deploy_database.sh <temp-database-path> <target-database-name-and-path>
 # Database will be uploaded to the server at the given path (relative to the data directory).
-# EXAMPLE:  ./deploy_database.sh /tmp/upload.nsf test/mydatabase.nsf
+# EXAMPLE: ./deploy_database.sh /tmp/upload.nsf test/mydatabase.nsf
 
 set -e
 
 # Parameters
 ORIGINAL_DATABASE=$1
 DBNAME=$2
-# TODO:  make title a parameter
+# TODO: make title a parameter
 TITLE=`printf "$DBNAME" | sed 's/\.nsf$//' | sed 's:^.*\/\([^/]*\)$:\1:'`
 echo "Uploading database $ORIGINAL_DATABASE to $DBNAME ($TITLE)"
 
@@ -33,7 +33,7 @@ fi
 
 # create the trigger file
 # For now, I am giving "-Default-" designer access to that the user be able to deploy agents.
-# TODO:  add an entry for the safe ID user(s) instead.
+# TODO: add an entry for the safe ID user(s) instead.
 cat > /tmp/$JSON_NAME << EndOfMessage
 {
     "title": "Upload Database",
@@ -127,7 +127,7 @@ sudo chown -R domino.domino "$JSON_TRIGGER_DIR"
 
 # copy the file to trigger the action
 sudo mv $JSON_TMP $JSON_TRIGGER_FILE
-echo "Starting import:  $JSON_TRIGGER_FILE"
+echo "Starting import: $JSON_TRIGGER_FILE"
 
 # wait for the file to be removed
 while [ -e $JSON_TRIGGER_FILE ]
@@ -145,6 +145,6 @@ RESPONSE=$(cat "$RESPONSE_FILE" | tr -d '\n')
 if [ "$RESPONSE" = "OK" ]; then
 	echo "Successfully deployed database."
 else
-	echo "Deployment failed:  '$RESPONSE'"
+	echo "Deployment failed: '$RESPONSE'"
 	exit 1
 fi

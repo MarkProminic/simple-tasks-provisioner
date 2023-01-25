@@ -3,15 +3,15 @@
 # This script assumes that the project was configured following the conventions
 # in the Domino Visual Editor and Domino On Disk Project templates in Moonshine-IDE
 #
-# USAGE:  ./run_nsfodp.sh <zip>
+# USAGE: ./run_nsfodp.sh <zip>
 # Parameters:
-#   - <zip>.  The path to the zip file containing the application to deploy.  
+#   - <zip>.  The path to the zip file containing the application to deploy.
 #             The zip is expected to contain pom.xml at the top level (no parent directory).
 
 set -e
 
 ZIP_FILE=$1
-# TODO:  move this to parameter?
+# TODO: move this to parameter?
 DATABASE=nsfs/nsf-moonshine/target/nsf-moonshine-domino-1.0.0.nsf
 
 echo "Starting NSFODP for file $ZIP_FILE"
@@ -36,7 +36,7 @@ OUTPUT_DIR=/tmp/restinterface/generated/
 OUTPUT_FILE=$OUTPUT_DIR/$TIMESTAMP.nsf
 mkdir -p $OUTPUT_DIR
 cp "$DATABASE" "$OUTPUT_FILE"
-echo "Generated Database:  '$OUTPUT_FILE'"
+echo "Generated Database: '$OUTPUT_FILE'"
 
 
 # Cleanup

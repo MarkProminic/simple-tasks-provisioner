@@ -1,7 +1,7 @@
 ---
 -
   name: "Create Directories for SSLs"
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     owner: "{{ service_user }}"
@@ -18,28 +18,28 @@
     - "{{ cert_dir }}/combined"
     - "{{ cert_dir }}/ca"
 
-- 
+-
   name: "Checking if SSL default certs exists"
   when: not selfsigned_enabled
-  wait_for:
+  ansible.builtin.wait_for:
     path: "{{ item }}"
   with_items:
     - "{{ cert_dir }}/key/default-signed.key"
     - "{{ cert_dir }}/crt/default-signed.crt"
     - "{{ cert_dir }}/ca/default-signed.ca"
 
-- 
+-
   name: "Generating self signed SSL Key"
   when: selfsigned_enabled
-  openssl_privatekey:
+  community.crypto.openssl_privatekey:
     path: "{{ cert_dir }}/key/{{ settings.hostname }}.{{ settings.domain }}-self-signed.key"
     owner: "{{ service_user }}"
     mode: '0777'
 
-- 
+-
   name: "Generating self signed CSR Request"
   when: selfsigned_enabled
-  openssl_csr:
+  community.crypto.openssl_csr:
     path: "{{ cert_dir }}/csr/{{ settings.hostname }}.{{ settings.domain }}-self-signed.csr"
     privatekey_path: "{{ cert_dir }}/key/{{ settings.hostname }}.{{ settings.domain }}-self-signed.key"
     country_name: "{{ countrycode }}"
@@ -51,13 +51,23 @@
       - "DNS:domino.{{ settings.hostname }}.{{ settings.domain }}"
       - "DNS:traveler.{{ settings.hostname }}.{{ settings.domain }}"
       - "DNS:verse.{{ settings.hostname }}.{{ settings.domain }}"
+      - "DNS:console.{{ settings.hostname }}.{{ settings.domain }}"
+      - "DNS:logging.{{ settings.hostname }}.{{ settings.domain }}"
+      - "DNS:welcome.{{ settings.hostname }}.{{ settings.domain }}"
+      - "DNS:proxy.{{ settings.hostname }}.{{ settings.domain }}"
+      - "DNS:downloads.{{ settings.hostname }}.{{ settings.domain }}"
+      - "DNS:sametime.{{ settings.hostname }}.{{ settings.domain }}"
+      - "DNS:leap.{{ settings.hostname }}.{{ settings.domain }}"
+      - "DNS:restapi.{{ settings.hostname }}.{{ settings.domain }}"
+      - "DNS:guacamole.{{ settings.hostname }}.{{ settings.domain }}"
+      - "DNS:www.{{ settings.hostname }}.{{ settings.domain }}"
     owner: "{{ service_user }}"
     mode: '0777'
 
-- 
+-
   name: "Generating self signed Certificate"
   when: selfsigned_enabled
-  openssl_certificate:
+  community.crypto.x509_certificate:
     provider: selfsigned
     path: "{{ cert_dir }}/crt/{{ settings.hostname }}.{{ settings.domain }}-self-signed.crt"
     privatekey_path: "{{ cert_dir }}/key/{{ settings.hostname }}.{{ settings.domain }}-self-signed.key"
@@ -65,12 +75,12 @@
     owner: "{{ service_user }}"
     mode: '0777'
 
-- 
-  name: "Generating PKCS12 file"
+-
+  name: "Generating self signed PKCS12 file"
   when: selfsigned_enabled
-  openssl_pkcs12:
+  community.crypto.openssl_pkcs12:
     action: export
-    path: "{{ cert_dir }}/crt/{{ settings.hostname }}.{{ settings.domain }}-self-signed.pfk"
+    path: "{{ cert_dir }}/pfx/{{ settings.hostname }}.{{ settings.domain }}-self-signed.pfk"
     certificate_path: "{{ cert_dir }}/crt/{{ settings.hostname }}.{{ settings.domain }}-self-signed.crt"
     privatekey_path: "{{ cert_dir }}/key/{{ settings.hostname }}.{{ settings.domain }}-self-signed.key"
     state: present
@@ -78,12 +88,12 @@
     owner: "{{ service_user }}"
     mode: '0777'
 
-- 
-  name: "Generating PKCS12 file"
+-
+  name: "Generating Signed PKCS12 file"
   when: not selfsigned_enabled
-  openssl_pkcs12:
+  community.crypto.openssl_pkcs12:
     action: export
-    path: "{{ cert_dir }}/pfk/default-signed.pfk"
+    path: "{{ cert_dir }}/pfx/default-signed.pfk"
     certificate_path: "{{ cert_dir }}/crt/default-signed.crt"
     privatekey_path: "{{ cert_dir }}/key/default-signed.key"
     other_certificates_parse_all: true
@@ -94,23 +104,23 @@
     owner: "{{ service_user }}"
     mode: '0777'
 
-- 
-  name: "Parsing PKCS12 file to concatenated PEM"
+-
+  name: "Parsing self-signed PKCS12 file to concatenated PEM"
   when: selfsigned_enabled
-  openssl_pkcs12:
+  community.crypto.openssl_pkcs12:
     action: parse
-    src: "{{ cert_dir }}/crt/{{ settings.hostname }}.{{ settings.domain }}-self-signed.pfk"
+    src: "{{ cert_dir }}/pfx/{{ settings.hostname }}.{{ settings.domain }}-self-signed.pfk"
     path: "{{ cert_dir }}/combined/{{ settings.hostname }}.{{ settings.domain }}-self-signed.pem"
     state: present
     owner: "{{ service_user }}"
     mode: '0777'
 
-- 
+-
   name: "Parsing PKCS12 file to concatenated PEM"
   when: not selfsigned_enabled
-  openssl_pkcs12:
+  community.crypto.openssl_pkcs12:
     action: parse
-    src: "{{ cert_dir }}/pfk/default-signed.pfk"
+    src: "{{ cert_dir }}/pfx/default-signed.pfk"
     path: "{{ cert_dir }}/combined/default-signed.pem"
     state: present
     owner: "{{ service_user }}"

@@ -13,7 +13,7 @@
   {% endif %}
   roles:
     {% for role in provision_roles %}
-    - 
+    -
       role: {{ role.name }}
       {% if role.when is defined %}
       when: {{ role.when }}

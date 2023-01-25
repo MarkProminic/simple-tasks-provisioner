@@ -1,12 +1,12 @@
 ---
 -
   name: "Setting hostname"
-  hostname:
+  ansible.builtin.hostname:
     name: "{{ settings.hostname }}.{{ settings.domain }}"
 
-- 
+-
   name: "Setting /etc/hosts"
-  replace:
+  ansible.builtin.replace:
     path: "/etc/hosts"
     regexp: "{{ item.regex }}"
     replace: "{{ item.replace }}"

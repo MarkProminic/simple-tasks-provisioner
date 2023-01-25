@@ -19,7 +19,7 @@ public class CheckDatabase {
 
     public static void main(String[] args) {
         if (args.length < 2) {
-            System.out.println("Insufficient Arguments.  Usage:  ");
+            System.out.println("Insufficient Arguments.  Usage: ");
             System.out.println("java -jar CheckDatabase.jar <server> <database> [acl_username]");
             System.exit(1);
         }
@@ -30,18 +30,18 @@ public class CheckDatabase {
         try {
 
             NotesThread.sinitThread();
-            
+
             Session session = NotesFactory.createSession();
-            System.out.println("Running on Notes Version:  '" + session.getNotesVersion() + "'.");
-        
+            System.out.println("Running on Notes Version: '" + session.getNotesVersion() + "'.");
+
 			// read a user to check against the ACL
 			String testUser = session.getUserName();  // check the running user
 			if (args.length >= 3) {
 				testUser = args[2];
 			}
-            
+
             checkServer(session, serverName);
-            
+
             Database database = session.getDatabase(serverName, databaseName, false);
             try {
                 if (null == database || !database.isOpen()) {
@@ -50,8 +50,8 @@ public class CheckDatabase {
                 String actualServerName = session.getServerName(); //session.getServerName();
                 String databaseTitle = database.getTitle();
                 System.out.println("SUCCESSFUL!");
-                System.out.println("Server:  '" + actualServerName + "', Database: '" + databaseTitle + "'.");
-                
+                System.out.println("Server: '" + actualServerName + "', Database: '" + databaseTitle + "'.");
+
                 checkACLAccess(database, testUser);
             }
             finally {
@@ -70,8 +70,8 @@ public class CheckDatabase {
             NotesThread.stermThread();
         }
     }
-    
-    
+
+
     public static void checkServer(Session session, String serverName) throws NotesException, Exception {
         DbDirectory directory = null;
         Database database = null;
@@ -83,7 +83,7 @@ public class CheckDatabase {
             }
             else {
 //                System.out.println("Successfully opened directory for server '" + serverName + "'.");
-                
+
                 database = directory.getFirstDatabase(DbDirectory.DATABASE);
                 if (null == database) {
                     throw new Exception("Unable to open database for server '" + serverName + "'.");
@@ -96,14 +96,14 @@ public class CheckDatabase {
 
         }
         catch (NotesException ex) {
-            throw new Exception("Unable to open server '" + serverName + "':  '" + ex.text + "'.");
+            throw new Exception("Unable to open server '" + serverName + "': '" + ex.text + "'.");
         }
         finally {
             if (null != database) { database.recycle(); }
             if (null != directory) { directory.recycle(); }
         }
     }
-    
+
     public static void checkACLAccess(Database database, String testUser) {
         try {
             //String title = database.getTitle();
@@ -133,11 +133,11 @@ public class CheckDatabase {
                     break;
                 default:
                     accessStr = "unknown";
-                    break; 
+                    break;
             }
             System.out.println("User '"+ testUser + "' has '" + accessStr + "' access to this database.");
 
-            System.out.println("Privileges:  ");
+            System.out.println("Privileges: ");
             int accPriv = database.queryAccessPrivileges(testUser);
             // Check each privilege bit to see if it is 0 or 1
             if ((accPriv & Database.DBACL_CREATE_DOCS) > 0)

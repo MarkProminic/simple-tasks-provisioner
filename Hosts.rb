@@ -23,7 +23,7 @@ class Hosts
       config.vm.define "#{host['settings']['server_id']}--#{host['settings']['hostname']}.#{host['settings']['domain']}" do |server|
 
         #Box Settings -- Used in downloading and packaging Vagrant boxes
-        server.vm.box = host['settings']['box'] 
+        server.vm.box = host['settings']['box']
         server.vm.box_version = host['settings']['box_version']
         server.vm.boot_timeout = host['settings']['setup_wait']
 
@@ -39,7 +39,7 @@ class Hosts
         config.winrm.timeout = host['settings']['setup_wait']
         config.winrm.retry_delay = 30
         config.winrm.retry_limit = 1000
-        
+
         ## Networking
         ## Note Do not place two IPs in the same subnet on both nics at the same time, They must be different subnets or on a different network segment(ie VLAN, physical seperation for Linux VMs)
         if host.has_key?('networks')
@@ -58,14 +58,14 @@ class Hosts
               pair = ""
               pairs = []
               interfaces.each_with_index do |line, index|
-                  pair = line if index %2 ==0 and line.start_with?("Name:") 
+                  pair = line if index %2 ==0 and line.start_with?("Name:")
                   pairs.append(pair.sub("Name:", '').strip) if index %2 !=0 and line.include? "Up"
                   pair = "" if index %2 !=0
               end
 
               defroute = ""
-              if not Vagrant::Util::Platform.windows? 
-                %x[netstat -rn -f inet].split("\n").each do |line|              
+              if not Vagrant::Util::Platform.windows?
+                %x[netstat -rn -f inet].split("\n").each do |line|
                     defroute = line.split("\s") if line.include? "UG"
                 end
               else
@@ -79,43 +79,43 @@ class Hosts
               end
 
               if network['type'] == 'external'
-                server.vm.network "public_network", 
-                  ip: network['address'], 
-                  dhcp: network['dhcp4'], 
-                  dhcp6: network['dhcp6'], 
-                  bridge: bridge, 
-                  auto_config: network['autoconf'], 
-                  netmask: network['netmask'], 
-                  vmac: network['mac'], 
+                server.vm.network "public_network",
+                  ip: network['address'],
+                  dhcp: network['dhcp4'],
+                  dhcp6: network['dhcp6'],
+                  bridge: bridge,
+                  auto_config: network['autoconf'],
+                  netmask: network['netmask'],
+                  vmac: network['mac'],
                   mac: network['vmac'],
                   gateway: network['gateway'],
                   nictype: network['type'],
                   nic_number: netindex,
                   managed: network['is_control'],
-                  vlan: network['vlan'] 
+                  vlan: network['vlan']
               end
               if network['type'] == 'host'
                 server.vm.network "private_network",
                   ip: network['address'],
                   dhcp: network['dhcp4'],
                   dhcp6: network['dhcp6'],
-                  bridge: bridge, 
+                  bridge: bridge,
                   auto_config: network['autoconf'],
-                  netmask: network['netmask'], 
-                  vmac: network['mac'], 
+                  netmask: network['netmask'],
+                  vmac: network['mac'],
                   mac: network['vmac'],
                   gateway: network['gateway'],
                   nictype: network['type'],
                   nic_number: netindex,
                   managed: network['is_control'],
-                  vlan: network['vlan'] 
+                  vlan: network['vlan']
               end
           end
         end
 
 
 
-        ##### Begin Virtualbox Configurations #####        
+        ##### Begin Virtualbox Configurations #####
         server.vm.provider :virtualbox do |vb|
           if host['settings']['memory'] =~ /gb|g|/
             host['settings']['memory']= 1024 * host['settings']['memory'].tr('^0-9', '').to_i
@@ -147,7 +147,7 @@ class Hosts
         # Register shared folders
         if host.has_key?('folders')
 					host['folders'].each do |folder|
-						mount_opts = folder['type'] == folder['type'] ? ['actimeo=1'] : [] 
+						mount_opts = folder['type'] == folder['type'] ? ['actimeo=1'] : []
 						server.vm.synced_folder folder['map'], folder ['to'],
 						type: folder['type'],
 						owner: folder['owner'] ||= host['settings']['vagrant_user'],
@@ -155,9 +155,9 @@ class Hosts
 						mount_options: mount_opts,
 						automount: true,
             rsync__args: folder['args'] ||= ["--verbose", "--archive", "-z", "--copy-links"],
-						rsync__chown:  folder['chown'] ||= 'false',
+						rsync__chown: folder['chown'] ||= 'false',
             create: folder['create'] ||= 'false',
-						rsync__rsync_ownership:  folder['rsync_ownership'] ||= 'true',
+						rsync__rsync_ownership: folder['rsync_ownership'] ||= 'true',
 						disabled: folder['disabled']||= false
 					end
 				end
@@ -191,13 +191,13 @@ class Hosts
                   ansible.verbose = localscript['verbose']
                   ansible.extra_vars = {
                     settings: host['settings'],
-                    networks: host['networks'], 
+                    networks: host['networks'],
                     secrets: secrets,
                     role_vars: host['vars'],
                     provision_roles: host['roles'],
                     demo_tasks_version: DemoTasks::VERSION,
                     ansible_winrm_server_cert_validation: "ignore",
-                    ansible_ssh_pipelining:localscript['ssh_pipelining'], 
+                    ansible_ssh_pipelining:localscript['ssh_pipelining'],
                     ansible_python_interpreter:localscript['ansible_python_interpreter']}
                 end
               end
@@ -210,15 +210,15 @@ class Hosts
                   ansible.playbook = remotescript['script']
                   ansible.compatibility_mode = remotescript['compatibility_mode'].to_s
                   ansible.verbose = remotescript['verbose']
-                  ansible.extra_vars = {                    
+                  ansible.extra_vars = {
                     settings: host['settings'],
-                    networks: host['networks'], 
+                    networks: host['networks'],
                     secrets: secrets,
                     role_vars: host['vars'],
                     provision_roles: host['roles'],
                     demo_tasks_version: DemoTasks::VERSION,
                     ansible_winrm_server_cert_validation: "ignore",
-                    ansible_ssh_pipelining:remotescript['ssh_pipelining'], 
+                    ansible_ssh_pipelining:remotescript['ssh_pipelining'],
                     ansible_python_interpreter:remotescript['ansible_python_interpreter']
                   }
                 end
@@ -235,17 +235,17 @@ class Hosts
           end
         end
       end
-      
+
       ## Open the browser after provisioning
       if host.has_key?('networks') && host['settings']['provider-type'] == 'virtualbox'
-        host['networks'].each_with_index do |network, netindex|  
+        host['networks'].each_with_index do |network, netindex|
           config.trigger.after [:up] do |trigger|
             trigger.ruby do |env,machine|
               puts "This server has been provisioned with DemoTasks Roles v" + DemoTasks::VERSION
               puts "https://github.com/DominoVagrant/demo-tasks/releases/tag/v" + DemoTasks::VERSION
               ipaddress = network['address']
-              system("vagrant ssh -c 'cat /ipaddress.yml' > .vagrant/detectedpublicaddress.txt")
-              ipaddress = File.readlines(".vagrant/detectedpublicaddress.txt").join("") if network['dhcp4']
+              system("vagrant ssh -c 'cat /vagrant/completed/ipaddress.yml' > .vagrant/provisioned-briged-ip.txt")
+              ipaddress = File.readlines(".vagrant/provisioned-briged-ip.txt").join("") if network['dhcp4']
               open_url = "https://" + ipaddress + ":443/welcome.html"
               system("/bin/bash -c 'xdg-open #{ open_url}'") if Vagrant::Util::Platform.linux? and host['settings']['open-browser']
               system("open", "#{ open_url}") if Vagrant::Util::Platform.windows? and host['settings']['open-browser']

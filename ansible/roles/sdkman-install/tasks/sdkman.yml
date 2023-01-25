@@ -1,31 +1,34 @@
 ---
-# tasks for managing SDKMAN!
-
-- name: Configure SDKMAN
-  template:
+-
+  name: Configure SDKMAN
+  ansible.builtin.template:
     src: templates/sdkman_config.j2
     dest: '{{ sdkman_dir }}/etc/config'
-    owner: '{{service_user }}'
+    owner: '{{ service_user }}'
     group: '{{ service_group }}'
+    mode: '0755'
 
-- name: Flush SDK caches (before)
-  shell: >-
+-
+  name: Flush SDK caches (before)
+  ansible.builtin.shell: >-
     . {{ sdkman_dir }}/bin/sdkman-init.sh && sdk flush {{ item }}
   args:
     executable: /bin/bash
   loop: '{{ sdkman_flush_caches_before }}'
   changed_when: false
 
-- name: Update SDKMAN
-  shell: . {{ sdkman_dir }}/bin/sdkman-init.sh && sdk selfupdate
+-
+  name: Update SDKMAN
+  ansible.builtin.shell: . {{ sdkman_dir }}/bin/sdkman-init.sh && sdk selfupdate
   args:
     executable: /bin/bash
   register: sdk_selfupdate
   changed_when: sdk_selfupdate.stdout != 'No update available at this time.'
   when: sdkman_update | bool
 
-- name: Install SDK candidates/versions
-  shell: >-
+-
+  name: Install SDK candidates/versions
+  ansible.builtin.shell: >-
     . {{ sdkman_dir }}/bin/sdkman-init.sh &&
     sdk install {{ item.candidate }} {{ item.version | default('') }} {{ item.localpath | default('') }}
   args:
@@ -38,8 +41,9 @@
     sdk_install.rc != 0 and
     'is already installed.' not in sdk_install.stdout
 
-- name: Uninstall SDK candidates/versions
-  shell: >-
+-
+  name: Uninstall SDK candidates/versions
+  ansible.builtin.shell: >-
     . {{ sdkman_dir }}/bin/sdkman-init.sh &&
     sdk uninstall {{ item.candidate }} {{ item.version }}
   args:
@@ -50,8 +54,9 @@
     not item.candidate + ' ' + item.version + ' is not installed.'
     in sdk_uninstall.stdout
 
-- name: Get SDK defaults
-  shell: . {{ sdkman_dir }}/bin/sdkman-init.sh && sdk current {{ item }}
+-
+  name: Get SDK defaults
+  ansible.builtin.shell: . {{ sdkman_dir }}/bin/sdkman-init.sh && sdk current {{ item }}
   args:
     executable: /bin/bash
   register: get_sdk_defaults
@@ -59,8 +64,9 @@
   loop: >-
     {{ sdkman_install_packages | map(attribute="candidate") | unique | list }}
 
-- name: Set SDK defaults
-  shell: >-
+-
+  name: Set SDK defaults
+  ansible.builtin.shell: >-
     . {{ sdkman_dir }}/bin/sdkman-init.sh &&
     sdk default {{ item.key }} {{ item.value }}
   args:
@@ -72,8 +78,9 @@
      selectattr('item', 'equalto', item.key) |
      first).stdout
 
-- name: Flush SDK caches (after)
-  shell: . {{ sdkman_dir }}/bin/sdkman-init.sh && sdk flush {{ item }}
+-
+  name: Flush SDK caches (after)
+  ansible.builtin.shell: . {{ sdkman_dir }}/bin/sdkman-init.sh && sdk flush {{ item }}
   args:
     executable: /bin/bash
   loop: '{{ sdkman_flush_caches_after }}'

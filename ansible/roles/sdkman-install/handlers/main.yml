@@ -1,7 +1,6 @@
 ---
-# handlers file for ansible-sdkman
-
-- name: Cleanup SDKMAN script
-  file:
+-
+  name: Cleanup SDKMAN script
+  ansible.builtin.file:
     path: '{{ sdkman_tmp_dir }}/sdkman_script'
     state: absent

@@ -104,7 +104,7 @@ frontend  HTTPS-IN
         {% else %}
         bind :::{{ haproxy_https_port }} v4v6 ssl crt  {{ cert_dir }}/combined/default-signed.pem
         {% endif %}
-        
+
         mode http
 
         http-request redirect scheme https unless { ssl_fc }
@@ -125,7 +125,7 @@ frontend  HTTPS-IN
         http-response set-header Access-Control-Max-Age 3628800
         http-response set-header Access-Control-Allow-Methods "*"
         # END CORS
-        
+
 
         #### ACL's  ####
         ## Source ACL Definitions
@@ -140,35 +140,35 @@ frontend  HTTPS-IN
         {% if rest_guest_port is defined %}
         acl host_restapi              hdr(host)          -i {{ vagrantrestinterface_url }}
         {% endif %}
-        
+
         {% if nomadweb_port is defined %}
         acl host_nomadweb             hdr(host)          -i {{ nomadweb_url }}
         {% endif %}
-        
+
         {% if domino_https_port is defined %}
         acl host_domino               hdr(host)          -i {{ domino_url }}
         {% endif %}
-        
+
         {% if python_simple_web_server_port is defined %}
         acl host_downloads            hdr(host)          -i {{ downloads_url }}
         {% endif %}
-        
+
         {% if leap_url is defined %}
         acl host_leap                 hdr(host)          -i {{ leap_url }}
         {% endif %}
-        
+
         {% if traveler_url is defined %}
         acl host_traveler             hdr(host)          -i {{ traveler_url }}
         {% endif %}
-        
+
         {% if sametime_port is defined %}
         acl host_sametime            hdr(host)          -i {{ sametime_url }}
         {% endif %}
-        
+
         {% if tomcat_https_port is defined %}
         acl host_guacamole            hdr(host)          -i {{ guacamole_url }}
         {% endif %}
-        
+
         {% if verse_url is defined %}
         acl host_verse                hdr(host)          -i {{ verse_url }}
         {% endif %}
@@ -177,31 +177,31 @@ frontend  HTTPS-IN
         {% if rest_guest_port is defined %}
         use_backend                     restapi              if host_restapi
         {% endif %}
-        
+
         {% if nomadweb_port is defined %}
-        use_backend                     nomadweb             if host_nomadweb 
+        use_backend                     nomadweb             if host_nomadweb
         {% endif %}
-        
+
         {% if domino_https_port is defined %}
         use_backend                     domino               if host_domino
-        {% endif %} 
-        
-        {% if python_simple_web_server_port is defined %} 
+        {% endif %}
+
+        {% if python_simple_web_server_port is defined %}
         use_backend                     downloads            if host_downloads || host_demo
-        {% endif %} 
+        {% endif %}
 
         {% if leap_url is defined %}
         use_backend                     leap                 if host_leap
         {% endif %}
-        
+
         {% if traveler_url is defined %}
         use_backend                     traveler             if host_traveler
-        {% endif %} 
+        {% endif %}
 
         {% if sametime_port is defined %}
         use_backend                     sametime            if host_sametime
-        {% endif %} 
-        
+        {% endif %}
+
         {% if tomcat_https_port is defined %}
         use_backend                     guacamole            if host_guacamole
         {% endif %}

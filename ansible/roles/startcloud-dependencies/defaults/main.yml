@@ -4,6 +4,7 @@ packages:
   - lynx
   - lshw
   - libxml2-utils
+  - tree
 pip_packages:
   - pexpect
   - PyMySQL
