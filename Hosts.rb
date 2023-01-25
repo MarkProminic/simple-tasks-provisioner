@@ -247,9 +247,7 @@ class Hosts
               system("vagrant ssh -c 'cat /vagrant/completed/ipaddress.yml' > .vagrant/provisioned-briged-ip.txt")
               ipaddress = File.readlines(".vagrant/provisioned-briged-ip.txt").join("") if network['dhcp4']
               open_url = "https://" + ipaddress + ":443/welcome.html"
-              system("/bin/bash -c 'xdg-open #{ open_url}'") if Vagrant::Util::Platform.linux? and host['settings']['open-browser']
-              system("open", "#{ open_url}") if Vagrant::Util::Platform.windows? and host['settings']['open-browser']
-              system("open", "#{ open_url}") if Vagrant::Util::Platform.darwin? and host['settings']['open-browser']
+              system("echo '" + open_url + "' > .vagrant/done.txt")
             end
           end
         end
