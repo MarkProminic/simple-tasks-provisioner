@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.16](https://github.com/DominoVagrant/demo-tasks/compare/demo-tasks/v0.1.15...demo-tasks/v0.1.16) (2023-01-25)
+
+
+### Bug Fixes
+
+* ssl self signed enabled ([ee0fb5d](https://github.com/DominoVagrant/demo-tasks/commit/ee0fb5d856236cd7f92578e5d66c7211ddb0cabf))
+
 ## [0.1.15](https://github.com/DominoVagrant/demo-tasks/compare/demo-tasks-v0.1.14...demo-tasks/v0.1.15) (2023-01-25)
 
 
