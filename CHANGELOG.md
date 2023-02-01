@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.18](https://github.com/DominoVagrant/demo-tasks/compare/demo-tasks/v0.1.17...demo-tasks/v0.1.18) (2023-02-01)
+
+
+### Bug Fixes
+
+* port-fwrding and roles, prepare new feats ([034f584](https://github.com/DominoVagrant/demo-tasks/commit/034f584a90d2cded4452111aa4e01022b60e35e4))
+
 ## [0.1.17](https://github.com/DominoVagrant/demo-tasks/compare/demo-tasks/v0.1.16...demo-tasks/v0.1.17) (2023-01-25)
 
 
