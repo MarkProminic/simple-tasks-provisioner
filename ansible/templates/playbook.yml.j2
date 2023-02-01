@@ -18,10 +18,27 @@
       {% if role.when is defined %}
       when: {{ role.when }}
       {% endif %}
-      {% if role.vars is defined %}
+      {% if role.vars is defined or role.port_forwards is defined %}
       vars:
+        {% if role.vars is defined %}
         {% for key, value in role.vars.items() %}
         {{ key }}: {{ value }}
         {% endfor %}
         {% endif %}
+        {% if role.port_forwards is defined %}
+        {{ role.name }}_port_forwards:
+          {% for ports in role.port_forwards %}
+            - 
+              guest: {{ ports.guest }}
+              host: {{ ports.host }}
+              ip: {{ ports.ip }}
+              {% if ports.url is defined %}
+              url: {{ ports.url }}
+              {% endif %}
+              {% if ports.proxied is defined %}
+              proxied: {{ ports.proxied }}
+              {% endif %}
+          {% endfor %}
+        {% endif %}
+      {% endif %}
     {% endfor %}

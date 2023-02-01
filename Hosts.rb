@@ -42,7 +42,7 @@ class Hosts
 
         ## Networking
         ## Note Do not place two IPs in the same subnet on both nics at the same time, They must be different subnets or on a different network segment(ie VLAN, physical seperation for Linux VMs)
-        if host.has_key?('networks')
+        if host.has_key?('networks') and !host['networks'].empty?
           host['networks'].each_with_index do |network, netindex|
               network['vmac'] = network['mac'].tr(':', '') if host['provider-type'] == 'virtualbox'
               ## Use default route as the Gateway device
@@ -113,7 +113,8 @@ class Hosts
           end
         end
 
-
+        ##### Disk Configurations #####
+        ## https://sleeplessbeastie.eu/2021/05/10/how-to-define-multiple-disks-inside-vagrant-using-virtualbox-provider/
 
         ##### Begin Virtualbox Configurations #####
         server.vm.provider :virtualbox do |vb|
@@ -129,16 +130,27 @@ class Hosts
           vb.customize ["modifyvm", :id, "--cpus", host['settings']['vcpus']]
           vb.customize ["modifyvm", :id, "--memory", host['settings']['memory']]
           vb.customize ["modifyvm", :id, "--firmware", 'efi'] if host['settings']['firmware_type'] == 'UEFI'
+          vb.customize ['modifyvm', :id, "--vrde", 'on']
+          vb.customize ['modifyvm', :id, "--natdnsproxy1", 'off']
+          vb.customize ['modifyvm', :id, "--natdnshostresolver1", 'off']
+          vb.customize ['modifyvm', :id, "--accelerate3d", 'off']
+          vb.customize ['modifyvm', :id, "--vram", '256']
 
-          if host['vbox'].has_key?('port-forwards')
-            host['vbox']['port-forwards'].each_with_index do |param, index|
-              config.vm.network "forwarded_port", guest: param['guest'], host: param['host'], host_ip: param['ip']
+          if host.has_key?('roles') and !host['roles'].empty?
+            host['roles'].each do |rolefwds|
+              if rolefwds.has_key?('port_forwards') and !rolefwds.empty?
+                rolefwds['port_forwards'].each_with_index do |param, index|
+                  config.vm.network "forwarded_port", guest: param['guest'], host: param['host'], host_ip: param['ip']
+                end
+              end
             end
           end
 
-          if host['vbox'].has_key?('directives')
-            host['vbox']['directives'].each do |param|
-              vb.customize ['modifyvm', :id, "--#{param['directive']}", param['value']]
+          if host.has_key?('vbox') and !host['vbox'].empty?
+            if host['vbox'].has_key?('directives') and !host['vbox']['directives'].empty?
+              host['vbox']['directives'].each do |param|              
+                vb.customize ['modifyvm', :id, "--#{param['directive']}", param['value']]
+              end
             end
           end
         end
