@@ -7,9 +7,7 @@ on:
 
 jobs:
   release-please:
-    runs-on:
-      - self-hosted
-      - debian-11
+    runs-on: ubuntu-latest
     steps:
       - 
         name: Release-Please
