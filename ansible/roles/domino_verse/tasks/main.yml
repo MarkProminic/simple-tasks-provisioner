@@ -29,6 +29,7 @@
   until: "verseresult is not failed"
   retries: 3
   ansible.builtin.get_url:
+    mode: '0755'
     url: "{{ domino_installer_base_url }}/Verse/{{ verse_archive }}"
     dest: "{{ installer_dir }}/verse/archives/{{ verse_archive }}"
     username: "{{ domino_installer_url_user }}"

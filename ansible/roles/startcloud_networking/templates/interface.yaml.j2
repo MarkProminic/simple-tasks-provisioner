@@ -2,6 +2,7 @@
 ---
 network:
   ethernets:
+    renderer: NetworkManager
     public_adapter:
       accept-ra: false
     {% if not networks[0].dhcp4%}

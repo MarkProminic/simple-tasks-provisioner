@@ -24,10 +24,11 @@
 
 -
   name: "Downloading domino-rest-api from {{ domino_installer_base_url }}"
-  register: domino-rest-apiresult
-  until: "domino-rest-apiresult is not failed"
+  register: domino_rest_apiresult
+  until: "domino_rest_apiresult is not failed"
   retries: 3
   ansible.builtin.get_url:
+    mode: '0755'
     url: "{{ domino_installer_base_url }}/domino-rest-api/{{ domino_rest_api_archive }}"
     dest: "{{ installer_dir }}/domino-rest-api/archives/{{ domino_rest_api_archive }}"
     username: "{{ domino_installer_url_user }}"

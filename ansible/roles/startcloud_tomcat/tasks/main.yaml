@@ -1,2 +1,4 @@
 ---
-- include_tasks: "tomcat-setup-{{ ansible_os_family }}.yml"
+-
+  name: "Installing Tomcat"
+  ansible.builtin.include_tasks: "tomcat-setup-{{ ansible_os_family }}.yml"

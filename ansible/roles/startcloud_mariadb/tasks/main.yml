@@ -1,29 +1,29 @@
 ---
-- 
+-
   name: "Installing MariaDB"
-  apt: 
-    name: 
+  ansible.builtin.apt:
+    name:
       - mariadb-server
 
-- 
+-
   name: "Starting MariaDB"
-  systemd: 
+  ansible.builtin.systemd:
     name: mariadb
     state: started
 
-- 
-  name: "Sets the {{ mariadb_admin_user }} password"
+-
+  name: "Sets the password for {{ mariadb_admin_user }}"
   become: true
   ignore_errors: true
-  mysql_user: 
+  community.mysql.mysql_user:
     user: "{{ mariadb_admin_user }}"
     password: "{{ mariadb_admin_pass }}"
     host: localhost
 
-- 
+-
   name: "Securing MariaDB"
-  become: true   
-  expect:
+  become: true
+  ansible.builtin.expect:
     command: mysql_secure_installation
     responses:
       'Enter current password for root \(enter for none\): ': ''
@@ -36,9 +36,10 @@
       'Remove test database and access to it\? \[Y\/n\]': 'y'
       'Reload privilege tables now\? \[Y\/n\]': 'y'
 
-- 
-  name: "configurating MariaDB to bind to all ports"
-  lineinfile:
+-
+  name: "Configuring MariaDB to bind to all ports"
+  ansible.builtin.lineinfile:
+    mode: "0755"
     path: "{{ item.dir }}"
     regexp: "^bind-address"
     create: true
@@ -46,8 +47,8 @@
   with_items:
     - { dir: "/etc/mysql/mariadb.conf.d/50-server.cnf" }
 
-- 
+-
   name: "Restarting MariaDB"
-  systemd: 
+  ansible.builtin.systemd:
     name: mariadb
     state: restarted

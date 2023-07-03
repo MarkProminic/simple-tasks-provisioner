@@ -26,7 +26,6 @@ class Hosts
         server.vm.box = host['settings']['box']
         server.vm.box_version = host['settings']['box_version']
         server.vm.boot_timeout = host['settings']['setup_wait']
-
         # Setup SSH and Prevent TTY errors
         server.ssh.username = host['settings']['vagrant_user']
         #server.ssh.password =  host['settings']['vagrant_user_pass']
@@ -97,24 +96,75 @@ class Hosts
               if network['type'] == 'host'
                 server.vm.network "private_network",
                   ip: network['address'],
-                  dhcp: network['dhcp4'],
-                  dhcp6: network['dhcp6'],
-                  bridge: bridge,
-                  auto_config: network['autoconf'],
-                  netmask: network['netmask'],
-                  vmac: network['mac'],
-                  mac: network['vmac'],
-                  gateway: network['gateway'],
-                  nictype: network['type'],
-                  nic_number: netindex,
-                  managed: network['is_control'],
-                  vlan: network['vlan']
+                  netmask: network['netmask']
               end
           end
         end
 
         ##### Disk Configurations #####
         ## https://sleeplessbeastie.eu/2021/05/10/how-to-define-multiple-disks-inside-vagrant-using-virtualbox-provider/
+        disks_directory = File.join("./", "disks")
+        
+        ## Create Disks
+        config.trigger.before :up do |trigger|
+          if host.has_key?('disks') and !host['disks'].empty?
+            trigger.name = "Create disks"
+            trigger.ruby do
+              unless File.directory?(disks_directory)
+                FileUtils.mkdir_p(disks_directory)
+              end
+              
+              host['disks']['additional_disks'].each_with_index do |disks, diskindex|
+                local_disk_filename = File.join(disks_directory, "#{disks['volume_name']}.vdi")
+                unless File.exist?(local_disk_filename)
+                  puts "Creating \"#{disks['volume_name']}\" disk with size \"#{disks['size'].delete('^0-9').to_i * 1024}\""
+                  system("VBoxManage createmedium --filename #{local_disk_filename} --size #{disks['size'].delete('^0-9').to_i * 1024} --format VDI")
+                end
+              end
+            end  
+          end
+        end
+
+        # create storage controller on first run
+        if host.has_key?('disks') and !host['disks'].empty?
+          unless File.directory?(disks_directory)
+            config.vm.provider "virtualbox" do |storage_provider|
+              storage_provider.customize ["storagectl", :id, "--name", "Virtual I/O Device SCSI controller", "--add", "virtio-scsi", '--hostiocache', 'off']
+            end
+          end
+        end
+
+        # attach storage devices
+        if host.has_key?('disks') and !host['disks'].empty?
+          config.vm.provider "virtualbox" do |storage_provider|
+            host['disks']['additional_disks'].each_with_index do |disks, diskindex|
+              local_disk_filename = File.join(disks_directory, "#{disks['volume_name']}.vdi")
+              unless File.exist?(local_disk_filename)
+                storage_provider.customize ['storageattach', :id, '--storagectl', "Virtual I/O Device SCSI controller", '--port', disks['port'], '--device', 0, '--type', 'hdd', '--medium', local_disk_filename]
+              end
+            end
+          end
+        end
+
+        # cleanup after "destroy" action
+        config.trigger.after :destroy do |trigger|
+          if host.has_key?('disks') and !host['disks'].empty?
+            trigger.name = "Cleanup operation"
+            trigger.ruby do
+              # the following loop is now obsolete as these files will be removed automatically as machine dependency
+              host['disks']['additional_disks'].each_with_index do |disks, diskindex|
+                local_disk_filename = File.join(disks_directory, "#{disks['volume_name']}.vdi")
+                if File.exist?(local_disk_filename)
+                  puts "Deleting \"#{disks['volume_name']}\" disk"
+                  system("vboxmanage closemedium disk #{local_disk_filename} --delete")
+                end
+              end
+              if File.exist?(disks_directory)
+                FileUtils.rmdir(disks_directory)
+              end
+            end
+          end
+        end
 
         ##### Begin Virtualbox Configurations #####
         server.vm.provider :virtualbox do |vb|
@@ -201,6 +251,7 @@ class Hosts
                   ansible.compatibility_mode = localscript['compatibility_mode'].to_s
                   ansible.install_mode = "pip" if localscript['install_mode'] == "pip"
                   ansible.verbose = localscript['verbose']
+                  ansible.config_file = "/vagrant/ansible/ansible.cfg"
                   ansible.extra_vars = {
                     settings: host['settings'],
                     networks: host['networks'],

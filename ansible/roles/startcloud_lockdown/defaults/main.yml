@@ -2,8 +2,8 @@
 show_help: true
 lockdown:
   - exim4
-  #- cockpit.socket
-  #- cockpit.service
+  #  - cockpit.socket
+  #  - cockpit.service
   - portmap
   - rpcbind.target
   - rpcbind.service

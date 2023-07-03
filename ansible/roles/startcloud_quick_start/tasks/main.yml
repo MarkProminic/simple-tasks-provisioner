@@ -13,6 +13,7 @@
   name: "Installing uploadserver for Python Web Server"
   ansible.builtin.pip:
     name: "uploadserver"
+    extra_args: --user --break-system-packages
 
 -
   name: "Registering Output of IP Address"

@@ -19,7 +19,7 @@
     - "{{ cert_dir }}/ca"
 
 -
-  name: "using Existing Certificate"
+  name: "Using existing Certificate"
   when: not selfsigned_enabled
   block:
     -

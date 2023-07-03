@@ -31,6 +31,7 @@
   until: "domlsresult is not failed"
   retries: 3
   ansible.builtin.get_url:
+    mode: '0755'
     url: "{{ domino_installer_base_url }}/ND{{ domino_major_version }}/{{ domino_server_installer_tar }}"
     dest: "{{ installer_dir }}/domino/archives/{{ domino_server_installer_tar }}"
     username: "{{ domino_installer_url_user }}"
@@ -74,6 +75,7 @@
   retries: 3
   when: not fixpack_archive.stat.exists and not fixpack_extracted.stat.exists and not domino_installer_fixpack_install and fixpack_installed.stat.exists
   ansible.builtin.get_url:
+    mode: '0755'
     url: "{{ domino_installer_base_url }}/ND{{ domino_major_version }}/{{ domino_server_fixpack_tar }}"
     dest: "{{ installer_dir }}/domino/archives/{{ domino_server_fixpack_tar }}"
     username: "{{ domino_installer_url_user }}"
@@ -115,6 +117,7 @@
   until: "hflsresult is not failed"
   retries: 3
   ansible.builtin.get_url:
+    mode: '0755'
     url: "{{ domino_installer_base_url }}/ND{{ domino_major_version }}/{{ domino_server_hotfix_tar }}"
     dest: "{{ installer_dir }}/domino/archives/{{ domino_server_hotfix_tar }}"
     username: "{{ domino_installer_url_user }}"

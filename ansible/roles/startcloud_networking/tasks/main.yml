@@ -21,7 +21,7 @@
           ansible.builtin.template:
             src: "{{ item.src }}"
             dest: "{{ item.dest }}"
-            mode: '0644'
+            mode: '0700'
           loop:
             - { src: 'interface.yaml.j2', dest: '/etc/netplan/public_adapter.yaml' }
 

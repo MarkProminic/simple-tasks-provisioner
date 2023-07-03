@@ -16,7 +16,7 @@
                 <span class="tooltiptext">Demo-Tasks Wiki</span>
             </div>
             <div class="tooltip">
-                <a href="https://github.com/DominoVagrant/demo-tasks/releases/tag/v{{ demo_tasks_version }}" target="_blank" class="menu"><i class="fa fa-github" aria-hidden="true"></i>v{{ demo_tasks_version }}</a>
+                <a href="https://github.com/DominoVagrant/demo-tasks/releases/tag/demo-tasks%2Fv{{ demo_tasks_version }}" target="_blank" class="menu"><i class="fa fa-github" aria-hidden="true"></i>v{{ demo_tasks_version }}</a>
                 <span class="tooltiptext">Demo-Tasks Source</span>
             </div>
             <div class="tooltip" id="copied" style="display:none;">Copied to Clipboard</div>
@@ -66,11 +66,11 @@
             <p>1) The existing Notes Client on your desktop by using File --> Application --> Open then using this server name:</p>
             <p>&emsp;{{ settings.hostname }}.{{ settings.domain }}/{{ domino_organization }}</p>
             <p>2) Your browser by accessing:</p>
-            <p>&emsp;<a href="https://domino.{{ settings.hostname }}.{{ settings.domain }}/portal.nsf" target="_blank">Portal -- https://domino.{{ settings.hostname }}.{{ settings.domain }}/portal.nsf</a></p>
+            <p>&emsp;<a href="https://domino.{{ settings.hostname }}.{{ settings.domain }}/Super.Human.Portal/js-release/index.html" target="_blank">Portal -- https://domino.{{ settings.hostname }}.{{ settings.domain }}/portal.nsf</a></p>
             <p>3) via Console:</p>
             <p>&emsp;a) Press the Terminal button in the Super.Human.Installer application</p>
             <p>&emsp;or</p>
-            <p>&emsp;b) Open the <a href="https://console.{{ settings.hostname }}.{{ settings.domain }}/system/terminal" target="_blank">Web Console</a> and login with the linux user credentials below</p>
+            <p>&emsp;b) Open the <a href="https://console.{{ settings.hostname }}.{{ settings.domain }}/system" target="_blank">Web Console</a> and login with the linux user credentials below</p>
             <p>&emsp;then</p>
             <p>&emsp;To open the Domino console run <a href="#" onclick="CopyToClipboard('dom-console');return false;"><code id="dom-console">sudo domino console</code></a> </p>
         </div>
@@ -149,7 +149,7 @@
                 </li>
                 {% endif %}
                 <li>
-                    <a href="https://console.{{ settings.hostname }}.{{ settings.domain }}/system/terminal" target="_blank">Web Console</a>
+                    <a href="https://console.{{ settings.hostname }}.{{ settings.domain }}/system" target="_blank">Web Console</a>
                 </li>
             </ul>
         </div>
