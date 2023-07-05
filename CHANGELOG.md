@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.20](https://github.com/DominoVagrant/demo-tasks/compare/demo-tasks/v0.1.19...demo-tasks/v0.1.20) (2023-07-05)
+
+
+### Bug Fixes
+
+* Website Terminal Fix ([f78cb08](https://github.com/DominoVagrant/demo-tasks/commit/f78cb0869fe79fe66a273cf7b8c631c09f1c77b3))
+
 ## [0.1.19](https://github.com/DominoVagrant/demo-tasks/compare/demo-tasks/v0.1.18...demo-tasks/v0.1.19) (2023-07-05)
 
 
