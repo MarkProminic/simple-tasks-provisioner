@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.1.19](https://github.com/DominoVagrant/demo-tasks/compare/demo-tasks/v0.1.18...demo-tasks/v0.1.19) (2023-07-05)
+
+
+### Bug Fixes
+
+* Debian 14 support ([f5f5c27](https://github.com/DominoVagrant/demo-tasks/commit/f5f5c27e4cac63b5433a34793259d290f96f4466))
+* Debian 14 support ([31f32d8](https://github.com/DominoVagrant/demo-tasks/commit/31f32d8baca93ac835f25709c8dc9e35c3f62dba))
+* domino versioning ([1c78b41](https://github.com/DominoVagrant/demo-tasks/commit/1c78b41110d05b1161df45be3b02ba06050069f7))
+* remove major, minor, fix for domino installer ([bb839cc](https://github.com/DominoVagrant/demo-tasks/commit/bb839cc153d5e123bdc55ea16d63278430689a74))
+* update role remove portforwarding ([21a503a](https://github.com/DominoVagrant/demo-tasks/commit/21a503acefc22dc50ceba05db59199688e6ecf5c))
+
 ## [0.1.18](https://github.com/DominoVagrant/demo-tasks/compare/demo-tasks/v0.1.17...demo-tasks/v0.1.18) (2023-02-01)
 
 
