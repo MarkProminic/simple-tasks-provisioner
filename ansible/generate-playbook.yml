@@ -6,6 +6,12 @@
   hosts: all
   tasks:
     -
+      name: "Dynamically generating template playbook for SHI"
+      ansible.builtin.template:
+        dest: "Hosts.template.yml"
+        mode: a+x
+        src: "Hosts.template.yml.j2"
+    -
       name: "Dynamically generating playbook"
       ansible.builtin.template:
         dest: "/vagrant/ansible/playbook.yml"

@@ -17,7 +17,6 @@ jobs:
         with:
           command: manifest
           default-branch: main
-          target-branch: main
           package-name: demo-tasks
           bump-minor-pre-major: true
           bump-patch-for-minor-pre-major: true

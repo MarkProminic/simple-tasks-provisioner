@@ -16,6 +16,7 @@ safe-id-to-cross-certify/*.ID
 *.ID
 *.id
 *.ids
+SAFE.IDS
 
 # Build Files to Ignore
 .DS_Store
