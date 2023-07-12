@@ -1,5 +1,5 @@
 # coding: utf-8
-require File.expand_path("#{File.dirname(__FILE__)}/core/version.rb")
+require File.expand_path("#{File.dirname(__FILE__)}/version.rb")
 
 # This class takes the Hosts.yaml and set's the neccessary variables to run provider specific sequences to boot a VM.
 class Hosts
