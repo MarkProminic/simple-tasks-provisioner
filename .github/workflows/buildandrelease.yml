@@ -20,4 +20,4 @@ jobs:
           package-name: demo-tasks
           bump-minor-pre-major: true
           bump-patch-for-minor-pre-major: true
-          version-file: "version.rb"
+          version-file: "core/version.rb"
