@@ -76,7 +76,8 @@ the server.
 
 ## Visual Flow
 
-![Provisioning Process](images/vagrant-build-flow.gif)
+![image](https://github.com/MarkProminic/simple-tasks-provisioner/assets/50398495/f91a43f5-92fe-43a4-9d02-392b989ccf03)
+
 
 ## Common Problems
 
