@@ -42,8 +42,6 @@ Primary goal is to use Vagrant and various provisioners to configure a Virtualbo
 * **Template:** [Packer](https://app.vagrantup.com/STARTcloud/boxes/debian12-server)
 * **Build Source:** [Repo](Notyetavailableforpublicconsumption)
 
-Each Release will be a at the time, stable branch. Recommended to use the latest.
-
 ## Getting Started
 
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes, as well as what will power the build process of the VMs at Prominic.NET.
