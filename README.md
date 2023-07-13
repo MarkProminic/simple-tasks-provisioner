@@ -2,9 +2,8 @@
 <br />
 <p align="center">
   <a href="https://github.com/MarkProminic/simple-tasks-provisioner/">
-    <img src="https://startcloud.com/assets/logo-big.jpg" alt="Logo" width="200" height="100">
+    <img src="https://startcloud.com/assets/logo-big.jpg" alt="Logo">
   </a>
-
   <h3 align="center">Simple Vagrant Build Provisioner</h3>
 
   <p align="center">
