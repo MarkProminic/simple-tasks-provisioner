@@ -25,7 +25,6 @@
 ## Table of Contents
 
 * [About the Project](#simple-task-provisioner)
-  * [Built With](#built-with)
 * [Getting Started](#getting-started)
 * [Access Methods](#accessing-the-server)
 * [Common Issues](#common-problems)
@@ -33,6 +32,7 @@
 * [Contributing](#contributing)
 * [License](#license)
 * [Contact](#authors)
+* [Built With](#built-with)
 * [Acknowledgements](#acknowledgments)
 
 ## Simple Task Provisioner
@@ -52,7 +52,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 You will need some software on your PC or Mac:
 
-```
+```bash
 git
 Vagrant
 Virtualbox
@@ -68,16 +68,17 @@ See more in the Wiki: [Clone, Config and Deploy](https://github.com/MarkProminic
 
 The installation process is estimated to take about 15 - 30 Minutes.
 
-```
+```bash
 vagrant up
 ```
 
+## Accessing the server
+
 Once the system has been provisioned, you can use 'vagrant ssh' to access
-it, or again the utility scripts vagrant_ssh.sh/vagrant_ssh.ps1 to create
-a log file of the ssh session.
+the server.
 
+## Visual Flow
 
-## The Process
 ![Provisioning Process](images/vagrant-build-flow.gif)
 
 ## Common Problems
@@ -86,7 +87,7 @@ a log file of the ssh session.
 
 If you get an error indicating that VirtualBox could not start in headless mode, open Vagrantfile and uncomment this line
 
-```
+```bash
      #vb.gui = true
 ```
 
@@ -95,6 +96,7 @@ If you get an error indicating that VirtualBox could not start in headless mode,
 See the [open issues](https://github.com/MarkProminic/simple-tasks-provisioner/issues) for a list of proposed features (and known issues).
 
 ## Built With
+
 * [Vagrant](https://www.vagrantup.com/) - Portable Development Environment Suite.
 * [VirtualBox](https://www.virtualbox.org/wiki/Downloads) - Hypervisor.
 * [Ansible](https://www.ansible.com/) - Virtual Manchine Automation Management.
@@ -104,6 +106,7 @@ See the [open issues](https://github.com/MarkProminic/simple-tasks-provisioner/i
 Please read [CONTRIBUTING.md](https://www.prominic.net) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Authors
+
 * **Joel Anderson** - *Initial work* - [JoelProminic](https://github.com/JoelProminic)
 * **Justin Hill** - *Initial work* - [JustinProminic](https://github.com/JustinProminic)
 * **Mark Gilbert** - *Refactor* - [MarkProminic](https://github.com/MarkProminic)
