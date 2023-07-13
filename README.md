@@ -98,6 +98,9 @@ View the contents of the CommandHelp.text for more details.
 This file will also be displayed followed each vagrant up operation for
 your continued reference.
 
+## The Process
+![Provisioning Process](images/vagrant-build-flow.gif)
+
 ## Common Problems
 
 ### Error for Headless VirtualBox
