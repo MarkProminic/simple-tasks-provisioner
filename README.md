@@ -5,10 +5,10 @@
     <img src="https://startcloud.com/assets/logo-big.jpg" alt="Logo" width="200" height="100">
   </a>
 
-  <h3 align="center">Domino Vagrant Build</h3>
+  <h3 align="center">Simple Vagrant Build Provisioner</h3>
 
   <p align="center">
-    An README to jumpstart your build of the Domino Development
+    An README to jumpstart your provisioner scripts
     <br />
     <a href="https://github.com/MarkProminic/simple-tasks-provisioner/"><strong>Explore the docs »</strong></a>
     <br />
@@ -24,23 +24,10 @@
 <!-- TABLE OF CONTENTS -->
 ## Table of Contents
 
-* [About the Project](#dominovagrant)
+* [About the Project](#simple-task-provisioner)
   * [Built With](#built-with)
 * [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Installation](#installation)
-    * [Mac OS X](https://github.com/MarkProminic/simple-tasks-provisioner/blob/master/MacMojaveReadme.md) -- Quick Start
-    * [Windows](https://github.com/MarkProminic/simple-tasks-provisioner/blob/master/Win10ReadMe.md) -- Quick Start
-* [Deployment](#deployment)
-  * [Cloning](#cloning-the-repo-locally)
-  * [Overview](#configuring-the-environment)
-  * [Variables](#commonly-changed-parameters)
-  * [Source Files](#source-files)
-* [Initialization](#starting-the-vm)
-  * [Access Methods](#accessing-the-domino-server)
-    * [Web](#web-interface)
-    * [Notes Client](#access-from-notes-client)
-    * [Console](#domino-console)
+* [Access Methods](#accessing-the-server)
 * [Common Issues](#common-problems)
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
@@ -48,8 +35,8 @@
 * [Contact](#authors)
 * [Acknowledgements](#acknowledgments)
 
+## Simple Task Provisioner
 
-## DominoVagrant
 Primary goal is to use Vagrant and various provisioners to configure a Virtualbox or Bhyve VM.
 
 * **Template:** [Packer](https://app.vagrantup.com/STARTcloud/boxes/debian12-server)
@@ -71,11 +58,11 @@ Vagrant
 Virtualbox
 ```
 
-## [Dependency Installation](https://github.com/MarkProminic/simple-tasks-provisioner/wiki/Dependency-Installation)
+See more in the Wiki: [Dependency Installation](https://github.com/MarkProminic/simple-tasks-provisioner/wiki/Dependency-Installation)
 
+## Clone, Config and Deploy
 
-## [Clone, Config and Deploy](https://github.com/MarkProminic/simple-tasks-provisioner/wiki/Clone-and-Deploy)
-
+See more in the Wiki: [Clone, Config and Deploy](https://github.com/MarkProminic/simple-tasks-provisioner/wiki/Clone-and-Deploy)
 
 ## Starting the VM
 
@@ -85,18 +72,10 @@ The installation process is estimated to take about 15 - 30 Minutes.
 vagrant up
 ```
 
-At this point, you can execute 'vagrant up' in the git checkout directory
-to spin up a vm instance, or use the utility scripts
-./scripts/vagrant_up.sh, ./scripts/vagrant_up.ps1 to create a log file with the initialization
-output in addition to showing on the screen.
-
 Once the system has been provisioned, you can use 'vagrant ssh' to access
 it, or again the utility scripts vagrant_ssh.sh/vagrant_ssh.ps1 to create
 a log file of the ssh session.
 
-View the contents of the CommandHelp.text for more details.
-This file will also be displayed followed each vagrant up operation for
-your continued reference.
 
 ## The Process
 ![Provisioning Process](images/vagrant-build-flow.gif)
